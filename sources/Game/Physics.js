@@ -31,5 +31,7 @@ export class Physics
     {
         this.world.step()
         const position = this.rigidBody.translation()
+
+        // console.log(position)
     }
 }

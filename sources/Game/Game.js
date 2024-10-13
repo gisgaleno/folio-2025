@@ -1,4 +1,5 @@
 import { Physics } from './Physics.js'
+import { PhysicsDebug } from './PhysicsDebug.js'
 import { Rendering } from './Rendering.js'
 import { Time } from './Time.js'
 import { View } from './View.js'
@@ -24,6 +25,7 @@ export class Game
         this.world = new World()
         this.view = new View()
         this.rendering = new Rendering()
+        this.physicsDebug = new PhysicsDebug()
     }
 }
 

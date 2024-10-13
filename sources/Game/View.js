@@ -10,7 +10,7 @@ export class View
     {
         this.game = new Game()
 
-        this.camera = new THREE.PerspectiveCamera(25, this.game.viewport.ratio, 0.1, 100)
+        this.camera = new THREE.PerspectiveCamera(25, this.game.viewport.ratio, 0.1, 1000)
         this.camera.position.set(2, 3, 4)
         this.game.world.scene.add(this.camera)
 
