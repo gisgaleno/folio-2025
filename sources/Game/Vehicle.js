@@ -20,6 +20,14 @@ export class Vehicle
         this.stopped = true
         this.stoppedTime = 0
 
+        if(this.game.debug.active)
+        {
+            this.debugPanel = this.game.debug.panel.addFolder({
+                title: '🚗 Vehicle',
+                expanded: true,
+            })
+        }
+
         this.setWheels()
         this.setJump()
         this.setReset()
@@ -56,70 +64,108 @@ export class Vehicle
 
     setWheels()
     {
-        const wheelsSetting = {
+        this.wheels = {}
+        this.wheels.settings = {
             offset: { x: 0.75, y: -0.4, z: 0.8 }, // No default
+            radius: 0.5,                          // No default
             directionCs: { x: 0, y: -1, z: 0 },   // Suspension direction
             axleCs: { x: -1, y: 0, z: 0 },        // Rotation axis
-            frictionSlip: 20,             // 10.5
-            maxSuspensionForce: 6000,    // 6000
-            maxSuspensionTravel: 5,      // 5
-            radius: 0.5,                 // No default
-            sideFrictionStiffness: 0.6,  // 1
-            suspensionCompression: 2,    // 0.83
-            suspensionRelaxation: 1.88,  // 0.88
-            suspensionRestLength: 0.125, // No default
-            suspensionStiffness: 30,     // 5.88
+            frictionSlip: 0.9,                    // 10.5
+            maxSuspensionForce: 100,              // 100
+            maxSuspensionTravel: 2,               // 5
+            sideFrictionStiffness: 0.6,           // 1
+            suspensionCompression: 2,             // 0.83
+            suspensionRelaxation: 1.88,           // 0.88
+            suspensionRestLength: 0.125,          // No default
+            suspensionStiffness: 30,              // 5.88
         }
-        const wheelsPositions = [
-            new THREE.Vector3(  wheelsSetting.offset.x, wheelsSetting.offset.y,   wheelsSetting.offset.z),
-            new THREE.Vector3(  wheelsSetting.offset.x, wheelsSetting.offset.y, - wheelsSetting.offset.z),
-            new THREE.Vector3(- wheelsSetting.offset.x, wheelsSetting.offset.y,   wheelsSetting.offset.z),
-            new THREE.Vector3(- wheelsSetting.offset.x, wheelsSetting.offset.y, - wheelsSetting.offset.z),
-        ]
-
-        this.wheels = {}
         this.wheels.items = []
         this.wheels.engineForce = 0
+        this.wheels.engineForceMax = 6
+        this.wheels.engineBoostMultiplier = 2.5
         this.wheels.steering = 0
+        this.wheels.steeringMax = 0.5
         this.wheels.visualSteering = 0
         this.wheels.inContact = 0
+        this.wheels.brakeStrength = 0.21
+        this.wheels.brakePerpetualStrength = 0.04
 
         for(let i = 0; i < 4; i++)
         {
-            const basePosition = wheelsPositions[i]
-            this.controller.addWheel(basePosition, wheelsSetting.directionCs, wheelsSetting.axleCs, wheelsSetting.suspensionRestLength, wheelsSetting.radius)
-
-            // Don't change
-            // this.controller.setWheelAxleCs(i, wheelsSetting.axleCs)
-            // this.controller.setWheelDirectionCs(i, wheelsSetting.directionCs)
-
-            // Player controlled
-            // this.controller.setWheelBrake(i, )
-            // this.controller.setWheelEngineForce(i, )
-            // this.controller.setWheelSteering(i, )
-
-            // Can be tweaked
-            this.controller.setWheelChassisConnectionPointCs(i, basePosition)
-            this.controller.setWheelFrictionSlip(i, wheelsSetting.frictionSlip)
-            this.controller.setWheelMaxSuspensionForce(i, wheelsSetting.maxSuspensionForce)
-            this.controller.setWheelMaxSuspensionTravel(i, wheelsSetting.maxSuspensionTravel)
-            this.controller.setWheelRadius(i, wheelsSetting.radius)
-            this.controller.setWheelSideFrictionStiffness(i, wheelsSetting.sideFrictionStiffness)
-            this.controller.setWheelSuspensionCompression(i, wheelsSetting.suspensionCompression)
-            this.controller.setWheelSuspensionRelaxation(i, wheelsSetting.suspensionRelaxation)
-            this.controller.setWheelSuspensionRestLength(i, wheelsSetting.suspensionRestLength)
-            this.controller.setWheelSuspensionStiffness(i, wheelsSetting.suspensionStiffness)
+            // Physical
+            this.controller.addWheel({ x: 0, y: 0, z: 0 }, this.wheels.settings.directionCs, this.wheels.settings.axleCs, this.wheels.settings.suspensionRestLength, this.wheels.settings.radius)
 
             // Visual
             const visual = new THREE.Mesh(
-                new THREE.CylinderGeometry(wheelsSetting.radius, wheelsSetting.radius, 0.5, 8),
+                new THREE.CylinderGeometry(1, 1, 0.5, 8),
                 new THREE.MeshNormalMaterial({ flatShading: true })
             )
             visual.geometry.rotateZ(Math.PI * 0.5)
             visual.rotation.reorder('YXZ')
-            visual.position.copy(basePosition)
             this.chassis.visual.add(visual)
-            this.wheels.items.push({ visual, basePosition })
+            this.wheels.items.push({ visual, basePosition: { x: 0, y: 0, z: 0 } })
+        }
+
+        this.wheels.updateSettings = () =>
+        {
+            const wheelsPositions = [
+                new THREE.Vector3(  this.wheels.settings.offset.x, this.wheels.settings.offset.y,   this.wheels.settings.offset.z),
+                new THREE.Vector3(  this.wheels.settings.offset.x, this.wheels.settings.offset.y, - this.wheels.settings.offset.z),
+                new THREE.Vector3(- this.wheels.settings.offset.x, this.wheels.settings.offset.y,   this.wheels.settings.offset.z),
+                new THREE.Vector3(- this.wheels.settings.offset.x, this.wheels.settings.offset.y, - this.wheels.settings.offset.z),
+            ]
+            
+            let i = 0
+            for(const wheel of this.wheels.items)
+            {
+                wheel.basePosition.x = wheelsPositions[i].x
+                wheel.basePosition.y = wheelsPositions[i].y
+                wheel.basePosition.z = wheelsPositions[i].z
+                
+                this.controller.setWheelRadius(i, this.wheels.settings.radius)
+                this.controller.setWheelChassisConnectionPointCs(i, wheel.basePosition)
+                this.controller.setWheelFrictionSlip(i, this.wheels.settings.frictionSlip)
+                this.controller.setWheelMaxSuspensionForce(i, this.wheels.settings.maxSuspensionForce)
+                this.controller.setWheelMaxSuspensionTravel(i, this.wheels.settings.maxSuspensionTravel)
+                this.controller.setWheelSideFrictionStiffness(i, this.wheels.settings.sideFrictionStiffness)
+                this.controller.setWheelSuspensionCompression(i, this.wheels.settings.suspensionCompression)
+                this.controller.setWheelSuspensionRelaxation(i, this.wheels.settings.suspensionRelaxation)
+                this.controller.setWheelSuspensionRestLength(i, this.wheels.settings.suspensionRestLength)
+                this.controller.setWheelSuspensionStiffness(i, this.wheels.settings.suspensionStiffness)
+
+                wheel.visual.scale.set(1, this.wheels.settings.radius, this.wheels.settings.radius)
+                wheel.visual.position.copy(wheel.basePosition)
+
+                i++
+            }
+        }
+
+        this.wheels.updateSettings()
+
+        // Debug
+        if(this.game.debug.active)
+        {
+            const panel = this.debugPanel.addFolder({
+                title: '🛞 Wheels',
+                expanded: true,
+            })
+
+            panel.addBinding(this.wheels.settings, 'offset', { min: -1, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'radius', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'frictionSlip', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'maxSuspensionForce', { min: 0, max: 1000, step: 1 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'maxSuspensionTravel', { min: 0, max: 2, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'sideFrictionStiffness', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'suspensionCompression', { min: 0, max: 10, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'suspensionRelaxation', { min: 0, max: 10, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'suspensionRestLength', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
+            panel.addBinding(this.wheels.settings, 'suspensionStiffness', { min: 0, max: 100, step: 0.1 }).on('change', this.wheels.updateSettings)
+            
+            panel.addBinding(this.wheels, 'steeringMax', { min: 0, max: Math.PI * 0.5, step: 0.01 })
+            panel.addBinding(this.wheels, 'brakeStrength', { min: 0, max: 1, step: 0.01 })
+            panel.addBinding(this.wheels, 'brakePerpetualStrength', { min: 0, max: 0.2, step: 0.01 })
+            panel.addBinding(this.wheels, 'engineForceMax', { min: 0, max: 10, step: 0.01 })
+            panel.addBinding(this.wheels, 'engineBoostMultiplier', { min: 0, max: 5, step: 0.01 })
         }
     }
 
@@ -127,6 +173,8 @@ export class Vehicle
     {
         this.jump = {}
         this.jump.force = 8
+        this.jump.turningTorque = 2
+        this.jump.recoverTorque = 4
         this.jump.jumpUp = () =>
         {
             if(this.wheels.inContact > 0)
@@ -136,9 +184,9 @@ export class Vehicle
 
                 let torqueY = 0
                 if(this.game.inputs.keys.left)
-                    torqueY += 2
-                else
-                    torqueY -= 2
+                    torqueY += this.jump.turningTorque
+                else if(this.game.inputs.keys.right)
+                    torqueY -= this.jump.turningTorque
                 this.chassis.physical.body.applyTorqueImpulse({ x: 0, y: torqueY, z: 0 })
             }
         }
@@ -148,7 +196,7 @@ export class Vehicle
                 const impulse = new THREE.Vector3(0, 1, 0).multiplyScalar(this.jump.force * this.chassis.physical.body.mass())
                 this.chassis.physical.body.applyImpulse(impulse)
 
-                const torque = 4 * this.upsideDownRatio
+                const torque = this.jump.recoverTorque * this.upsideDownRatio
                 this.chassis.physical.body.applyTorqueImpulse({ x: torque * 0.5, y: 0, z: torque })
         }
 
@@ -157,6 +205,19 @@ export class Vehicle
             if(_down)
                 this.jump.jumpUp()
         })
+        
+        // Debug
+        if(this.game.debug.active)
+        {
+            const panel = this.debugPanel.addFolder({
+                title: '⬆️ Jump',
+                expanded: true,
+            })
+
+            panel.addBinding(this.jump, 'force', { min: 0, max: 20, step: 0.01 })
+            panel.addBinding(this.jump, 'turningTorque', { min: 0, max: 10, step: 0.01 })
+            panel.addBinding(this.jump, 'recoverTorque', { min: 0, max: 10, step: 0.01 })
+        }
     }
 
     setReset()
@@ -182,26 +243,26 @@ export class Vehicle
         // Wheels
         this.wheels.engineForce = 0
         if(this.game.inputs.keys.up)
-            this.wheels.engineForce += 6
+            this.wheels.engineForce += this.wheels.engineForceMax
         if(this.game.inputs.keys.down)
-            this.wheels.engineForce -= 6
+            this.wheels.engineForce -= this.wheels.engineForceMax
 
         if(this.game.inputs.keys.boost)
-            this.wheels.engineForce *= 2.5
+            this.wheels.engineForce *= this.wheels.engineBoostMultiplier
 
         this.wheels.steering = 0
         if(this.game.inputs.keys.right)
-            this.wheels.steering -= 0.5
+            this.wheels.steering -= this.wheels.steeringMax
         if(this.game.inputs.keys.left)
-            this.wheels.steering += 0.5
+            this.wheels.steering += this.wheels.steeringMax
         this.controller.setWheelSteering(0, this.wheels.steering)
         this.controller.setWheelSteering(2, this.wheels.steering)
 
-        let brake = 0.04
+        let brake = this.wheels.brakePerpetualStrength
         if(this.game.inputs.keys.brake)
         {
             this.wheels.engineForce *= 0.5
-            brake = 0.5
+            brake = this.wheels.brakeStrength
         }
 
         for(let i = 0; i < 4; i++)
