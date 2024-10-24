@@ -43,6 +43,9 @@ export class Physics
         if(typeof _physicalDescription.position !== 'undefined')
             rigidBodyDesc.setTranslation(_physicalDescription.position.x, _physicalDescription.position.y, _physicalDescription.position.z)
 
+        if(typeof _physicalDescription.rotation !== 'undefined')
+            rigidBodyDesc.setRotation(_physicalDescription.rotation)
+
         if(typeof _physicalDescription.canSleep !== 'undefined')
             rigidBodyDesc.setCanSleep(_physicalDescription.canSleep)
 

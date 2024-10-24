@@ -58,6 +58,7 @@ export class Vehicle
                 type: 'dynamic',
                 shape: 'cuboid',
                 position: { x: 0, y: 1, z: 0 },
+                rotation: new THREE.Quaternion().setFromAxisAngle(new THREE.Euler(0, 1, 0), Math.PI * 0.5),
                 colliders: [ { shape: 'cuboid', parameters: [ 1, 0.5, 1.5 ] } ],
                 canSleep: false,
             },
