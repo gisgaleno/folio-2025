@@ -120,6 +120,8 @@ export class Vehicle
 
         this.wheels.updateSettings = () =>
         {
+            this.wheels.perimeter = this.wheels.settings.radius * Math.PI * 2
+
             const wheelsPositions = [
                 new THREE.Vector3(  this.wheels.settings.offset.x, this.wheels.settings.offset.y,   this.wheels.settings.offset.z),
                 new THREE.Vector3(  this.wheels.settings.offset.x, this.wheels.settings.offset.y, - this.wheels.settings.offset.z),
@@ -267,7 +269,6 @@ export class Vehicle
         this.unstuck.duration = 3
         this.unstuck.timeout = null
         this.unstuck.force = 8
-        this.unstuck.torque = 0.8
 
         this.unstuck.test = () =>
         {
@@ -299,7 +300,7 @@ export class Vehicle
             // Upside down
             if(upwarddAbsolute > sidewardAbsolute && upwarddAbsolute > forwardAbsolute)
             {
-                const torqueX = this.unstuck.torque * this.chassis.physical.body.mass()
+                const torqueX = 0.8 * this.chassis.physical.body.mass()
                 const torque = new THREE.Vector3(torqueX, 0, 0)
                 torque.applyQuaternion(this.chassis.physical.body.rotation())
                 this.chassis.physical.body.applyTorqueImpulse(torque)
@@ -332,7 +333,7 @@ export class Vehicle
                 expanded: true,
             })
 
-            panel.addBinding(this.unstuck, 'torque', { min: 0, max: 10, step: 0.01 })
+            panel.addBinding(this.unstuck, 'force', { min: 0, max: 20, step: 0.01 })
         }
     }
 
@@ -408,7 +409,8 @@ export class Vehicle
         {
             const wheel = this.wheels.items[i]
 
-            wheel.visual.rotation.z -= this.wheels.engineForce * 0.02 * this.game.time.deltaScaled
+            if(!this.game.inputs.keys.brake)
+                wheel.visual.rotation.z -= (this.speed * this.game.time.deltaScaled) / this.wheels.settings.radius
 
             if(i === 0 || i === 1)
                 wheel.visual.rotation.y = this.wheels.visualSteering
