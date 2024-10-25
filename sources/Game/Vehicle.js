@@ -35,7 +35,7 @@ export class Vehicle
         this.setFlip()
         this.setUnstuck()
         this.setReset()
-        this.setHydrolics()
+        this.setHydraulics()
 
         this.game.time.events.on('tick', () =>
         {
@@ -114,7 +114,6 @@ export class Vehicle
             sideFrictionStiffness: 0.6,           // 1
             suspensionCompression: 2,             // 0.83
             suspensionRelaxation: 1.88,           // 0.88
-            suspensionRestLength: 0.125,          // No default
             suspensionStiffness: 30,              // 5.88
         }
 
@@ -144,7 +143,6 @@ export class Vehicle
                 this.controller.setWheelSideFrictionStiffness(i, this.wheels.settings.sideFrictionStiffness)
                 this.controller.setWheelSuspensionCompression(i, this.wheels.settings.suspensionCompression)
                 this.controller.setWheelSuspensionRelaxation(i, this.wheels.settings.suspensionRelaxation)
-                this.controller.setWheelSuspensionRestLength(i, this.wheels.settings.suspensionRestLength)
                 this.controller.setWheelSuspensionStiffness(i, this.wheels.settings.suspensionStiffness)
 
                 wheel.visual.scale.set(this.wheels.settings.radius, this.wheels.settings.radius, 1)
@@ -172,7 +170,6 @@ export class Vehicle
             panel.addBinding(this.wheels.settings, 'sideFrictionStiffness', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
             panel.addBinding(this.wheels.settings, 'suspensionCompression', { min: 0, max: 10, step: 0.01 }).on('change', this.wheels.updateSettings)
             panel.addBinding(this.wheels.settings, 'suspensionRelaxation', { min: 0, max: 10, step: 0.01 }).on('change', this.wheels.updateSettings)
-            panel.addBinding(this.wheels.settings, 'suspensionRestLength', { min: 0, max: 1, step: 0.01 }).on('change', this.wheels.updateSettings)
             panel.addBinding(this.wheels.settings, 'suspensionStiffness', { min: 0, max: 100, step: 0.1 }).on('change', this.wheels.updateSettings)
             
             panel.addBinding(this.wheels, 'steeringMax', { min: 0, max: Math.PI * 0.5, step: 0.01 })
@@ -314,34 +311,54 @@ export class Vehicle
         })
     }
 
-    setHydrolics()
+    setHydraulics()
     {
-        this.hydrolics = {}
+        this.hydraulics = {}
+        this.hydraulics.low = 0.125
+        this.hydraulics.mid = 0.5
+        this.hydraulics.high = 1
 
-        this.hydrolics.update = () =>
+        for(let i = 0; i < 4; i++)
+            this.controller.setWheelSuspensionRestLength(i, this.hydraulics.low)
+
+        this.hydraulics.update = () =>
         {
-            const activeHydrolics = [
-                this.game.inputs.keys.hydrolics || this.game.inputs.keys.hydrolicsFront || this.game.inputs.keys.hydrolicsRight || this.game.inputs.keys.hydrolicsFrontRight, // front right
-                this.game.inputs.keys.hydrolics || this.game.inputs.keys.hydrolicsFront || this.game.inputs.keys.hydrolicsLeft || this.game.inputs.keys.hydrolicsFrontLeft, // front left
-                this.game.inputs.keys.hydrolics || this.game.inputs.keys.hydrolicsBack || this.game.inputs.keys.hydrolicsRight || this.game.inputs.keys.hydrolicsBackRight, // back right
-                this.game.inputs.keys.hydrolics || this.game.inputs.keys.hydrolicsBack || this.game.inputs.keys.hydrolicsLeft || this.game.inputs.keys.hydrolicsBackLeft, // back left
+            const activeHydraulics = [
+                this.game.inputs.keys.hydraulics || this.game.inputs.keys.hydraulicsFront || this.game.inputs.keys.hydraulicsRight || this.game.inputs.keys.hydraulicsFrontRight, // front right
+                this.game.inputs.keys.hydraulics || this.game.inputs.keys.hydraulicsFront || this.game.inputs.keys.hydraulicsLeft || this.game.inputs.keys.hydraulicsFrontLeft, // front left
+                this.game.inputs.keys.hydraulics || this.game.inputs.keys.hydraulicsBack || this.game.inputs.keys.hydraulicsRight || this.game.inputs.keys.hydraulicsBackRight, // back right
+                this.game.inputs.keys.hydraulics || this.game.inputs.keys.hydraulicsBack || this.game.inputs.keys.hydraulicsLeft || this.game.inputs.keys.hydraulicsBackLeft, // back left
             ]
 
-            const restLength = this.game.inputs.keys.hydrolics ? 1 : 0.5
+            const restLength = this.game.inputs.keys.hydraulics ? this.hydraulics.high :this.hydraulics.mid
             
             for(let i = 0; i < 4; i++)
-                this.controller.setWheelSuspensionRestLength(i, activeHydrolics[i] ? restLength : this.wheels.settings.suspensionRestLength)
+                this.controller.setWheelSuspensionRestLength(i, activeHydraulics[i] ? restLength : this.hydraulics.low)
         }
 
-        this.game.inputs.events.on('hydrolics', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsFront', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsBack', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsRight', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsLeft', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsFrontLeft', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsFrontRight', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsBackRight', this.hydrolics.update)
-        this.game.inputs.events.on('hydrolicsBackLeft', this.hydrolics.update)
+        this.game.inputs.events.on('hydraulics', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsFront', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsBack', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsRight', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsLeft', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsFrontLeft', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsFrontRight', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsBackRight', this.hydraulics.update)
+        this.game.inputs.events.on('hydraulicsBackLeft', this.hydraulics.update)
+
+
+        // Debug
+        if(this.game.debug.active)
+        {
+            const panel = this.debugPanel.addFolder({
+                title: '⬆️ Hydraulics',
+                expanded: true,
+            })
+
+            panel.addBinding(this.hydraulics, 'low', { min: 0, max: 2, step: 0.01 }).on('change', this.hydraulics.update)
+            panel.addBinding(this.hydraulics, 'mid', { min: 0, max: 2, step: 0.01 }).on('change', this.hydraulics.update)
+            panel.addBinding(this.hydraulics, 'high', { min: 0, max: 2, step: 0.01 }).on('change', this.hydraulics.update)
+        }
     }
 
     updatePrePhysics()
