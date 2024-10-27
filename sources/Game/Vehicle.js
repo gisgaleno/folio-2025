@@ -51,7 +51,7 @@ export class Vehicle
     {
         const visual = new THREE.Mesh(
             new THREE.BoxGeometry(1.5 * 2, 0.5 * 2, 1 * 2),
-            new THREE.MeshNormalMaterial({ wireframe: true })
+            new THREE.MeshNormalNodeMaterial({ wireframe: true })
         )
         this.game.world.scene.add(visual)
         this.chassis = this.game.physics.addEntity(
@@ -95,7 +95,7 @@ export class Vehicle
             // Visual
             const visual = new THREE.Mesh(
                 wheelGeometry,
-                new THREE.MeshNormalMaterial({ flatShading: true })
+                new THREE.MeshNormalNodeMaterial({ flatShading: true })
             )
             visual.rotation.reorder('YXZ')
             this.chassis.visual.add(visual)

@@ -12,7 +12,7 @@ export class PhysicsDebug
         this.geometry.setAttribute('position', new THREE.Float32BufferAttribute([], 3))
         this.geometry.setAttribute('color', new THREE.Float32BufferAttribute([], 4))
 
-        this.material = new THREE.LineBasicMaterial({ vertexColors: true })
+        this.material = new THREE.LineBasicNodeMaterial({ vertexColors: true })
 
         this.mesh = new THREE.LineSegments(this.geometry, this.material)
 
