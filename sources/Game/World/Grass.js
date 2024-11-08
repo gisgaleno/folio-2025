@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { Game } from '../Game.js'
-import { mix, positionWorld, transformedNormalView, matcapUV, modelViewMatrix, positionView, positionLocal, float, mod, texture, transformNormalToView, positionViewDirection, uniformArray, varying, vertexIndex, rotateUV, cameraPosition, vec4, cameraProjectionMatrix, cameraViewMatrix, atan2, billboarding, vec3, vec2, modelWorldMatrix, Fn, attribute, uniform, positionGeometry } from 'three'
+import { mix, matcapUV, float, mod, texture, transformNormalToView, uniformArray, varying, vertexIndex, rotateUV, cameraPosition, vec4, atan2, vec3, vec2, modelWorldMatrix, Fn, attribute, uniform } from 'three'
 import getWind from '../tsl/getWind.js'
 
 export class Grass
@@ -9,14 +9,10 @@ export class Grass
     {
         this.game = new Game()
 
-        this.details = 500
+        this.subdivisions = 500
         this.size = 80
-        this.count = this.details * this.details
-        this.fragmentSize = this.size / this.details
-        this.bladeWidthRatio = 1.5
-        this.bladeHeightRatio = 3
-        this.bladeHeightRandomness = 0.5
-        this.positionRandomness = 1
+        this.count = this.subdivisions * this.subdivisions
+        this.fragmentSize = this.size / this.subdivisions
 
         this.game.resources.load(
             [
@@ -43,7 +39,7 @@ export class Grass
         this.game.time.events.on('tick', () =>
         {
             this.update()
-        }, 5)
+        }, 6)
     }
 
     setGeometry()
@@ -51,21 +47,21 @@ export class Grass
         const position = new Float32Array(this.count * 3 * 2)
         const randomness = new Float32Array(this.count * 3)
 
-        for(let iX = 0; iX < this.details; iX++)
+        for(let iX = 0; iX < this.subdivisions; iX++)
         {
-            const fragmentX = (iX / this.details - 0.5) * this.size + this.fragmentSize * 0.5
+            const fragmentX = (iX / this.subdivisions - 0.5) * this.size + this.fragmentSize * 0.5
             
-            for(let iZ = 0; iZ < this.details; iZ++)
+            for(let iZ = 0; iZ < this.subdivisions; iZ++)
             {
-                const fragmentZ = (iZ / this.details - 0.5) * this.size + this.fragmentSize * 0.5
+                const fragmentZ = (iZ / this.subdivisions - 0.5) * this.size + this.fragmentSize * 0.5
 
-                const i = (iX * this.details + iZ)
+                const i = (iX * this.subdivisions + iZ)
                 const i3 = i * 3
                 const i6 = i * 6
 
                 // Center of the blade
-                const positionX = fragmentX + (Math.random() - 0.5) * this.fragmentSize * this.positionRandomness
-                const positionZ = fragmentZ + (Math.random() - 0.5) * this.fragmentSize * this.positionRandomness
+                const positionX = fragmentX + (Math.random() - 0.5) * this.fragmentSize
+                const positionZ = fragmentZ + (Math.random() - 0.5) * this.fragmentSize
 
                 position[i6    ] = positionX
                 position[i6 + 1] = positionZ
@@ -93,7 +89,7 @@ export class Grass
     {
         this.material = new THREE.MeshMatcapNodeMaterial()
         this.center = uniform(new THREE.Vector2())
-        this.trackDelta = uniform(new THREE.Vector2())
+        this.groundDataDelta = uniform(new THREE.Vector2())
 
         const vertexLoopIndex = varying(vertexIndex.toFloat().mod(3))
         const tipness = varying(vertexLoopIndex.step(0.5))
@@ -133,17 +129,16 @@ export class Grass
             bladePosition.assign(worldPosition.xz)
 
             // Wheel tracks
-            const wheelTracksColor = texture(
-                this.game.vehicle.wheelTracks.renderTarget.texture,
-                worldPosition.xz.sub(- this.game.vehicle.wheelTracks.halfSize).sub(this.center).add(this.trackDelta).div(this.game.vehicle.wheelTracks.size)
+            const groundDataColor = texture(
+                this.game.groundData.renderTarget.texture,
+                worldPosition.xz.sub(- this.game.groundData.halfSize).sub(this.center).add(this.groundDataDelta).div(this.game.groundData.size)
             )
-            const wheelsTracksHeight = wheelTracksColor.a.oneMinus().toVar()
+            const wheelsTracksHeight = groundDataColor.a.oneMinus().toVar()
 
             // Height
             const height = bladeHeight
                 .mul(bladeHeightRandomness.mul(attribute('randomness')).add(bladeHeightRandomness.oneMinus()))
                 .mul(wheelsTracksHeight)
-                
 
             // Shape
             const shape = vec3(
@@ -185,14 +180,6 @@ export class Grass
             return vec4(finalColor.rgb, 1)
         })()
 
-        // this.material.outputNode = Fn(() =>
-        // {
-        //     const wind = getWind([this.resources.noisesTexture, positionWorld.xz])
-        //     // const finalColor = matcapColor.mul(tipness)
-
-        //     return vec4(wind.xy, 0, 1)
-        // })()
-
         // // const testGeometry = new THREE.PlaneGeometry(20, 20, 1, 1)
         // const testGeometry = new THREE.SphereGeometry(2, 32, 32)
         // testGeometry.rotateX(- Math.PI * 0.5)
@@ -224,15 +211,17 @@ export class Grass
 
     update()
     {
+        // Move grass slightly forward
         const offset = new THREE.Vector2(this.game.view.spherical.offset.x, this.game.view.spherical.offset.z).setLength(this.size / 2).negate()
         this.center.value.set(
             this.game.view.position.x,
             this.game.view.position.z
         ).add(offset)
 
-        this.trackDelta.value.set(
-            this.center.value.x - this.game.vehicle.position.x,
-            this.center.value.y - this.game.vehicle.position.z
+        // Ground data delta
+        this.groundDataDelta.value.set(
+            this.center.value.x - this.game.groundData.focusPoint.x,
+            this.center.value.y - this.game.groundData.focusPoint.y
         )
     }
 }

@@ -17,7 +17,7 @@ export class Rendering
         this.game.time.events.on('tick', () =>
         {
             this.render()
-        }, 6)
+        }, 7)
 
         this.game.viewport.events.on('change', () =>
         {

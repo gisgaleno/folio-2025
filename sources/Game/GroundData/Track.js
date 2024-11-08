@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { Game } from '../Game.js'
 import { screenUV, mul, cos, sin, sign, atan2, varying, float, uv, texture, Fn, vec2, vec3, vec4, positionGeometry } from 'three'
 
-export class WheelTrack
+export class Track
 {
     constructor()
     {

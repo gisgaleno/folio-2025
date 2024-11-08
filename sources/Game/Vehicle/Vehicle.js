@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { Game } from '../Game.js'
 import { Events } from '../Events.js'
-import { WheelTrack } from './WheelTrack.js'
-import { WheelTracks } from './WheelTracks.js'
 
 export class Vehicle
 {
@@ -23,7 +21,6 @@ export class Vehicle
         this.speed = 0
         this.absoluteSpeed = 0
         this.upsideDownRatio = 0
-        this.wheelTracks = new WheelTracks()
 
         if(this.game.debug.active)
         {
@@ -105,8 +102,8 @@ export class Vehicle
             wheel.visual.rotation.reorder('YXZ')
             this.chassis.visual.add(wheel.visual)
 
-            // Track
-            wheel.track = this.wheelTracks.createTrack()
+            // Add track to ground data
+            wheel.track = this.game.groundData.createTrack()
 
             // Base position
             wheel.basePosition = new THREE.Vector3()
@@ -494,7 +491,7 @@ export class Vehicle
         else
             this.game.view.speedLines.targetStrength = 0
 
-        // Wheels tracks
-        this.wheelTracks.update(this.position)
+        // Ground data focus point
+        this.game.groundData.focusPoint.set(this.game.vehicle.position.x, this.game.vehicle.position.z)
     }
 }

@@ -1,6 +1,5 @@
 import RAPIER from '@dimforge/rapier3d-compat'
 import * as THREE from 'three'
-import { uniform, color, rangeFog } from 'three'
 import { Debug } from './Debug.js'
 import { Inputs } from './Inputs.js'
 import { Physics } from './Physics/Physics.js'
@@ -11,6 +10,7 @@ import { Vehicle } from './Vehicle/Vehicle.js'
 import { View } from './View.js'
 import { Viewport } from './Viewport.js'
 import { World } from './World/World.js'
+import { GroundData } from './GroundData/GroundData.js'
 
 export class Game
 {
@@ -61,6 +61,7 @@ export class Game
         this.viewport = new Viewport(this.domElement)
         this.resources = new Resources()
         this.physics = new Physics()
+        this.groundData = new GroundData()
         this.world = new World()
         this.vehicle = new Vehicle()
         this.view = new View()
