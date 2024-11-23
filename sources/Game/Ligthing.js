@@ -16,7 +16,7 @@ export class Lighting
         this.count = 1
         this.lights = []
         this.mapSizeMin = 512
-        this.shadowAmplitude = 20
+        this.shadowAmplitude = 25
         this.near = 1
         this.depth = 100
         this.shadowBias = - 0.01
@@ -103,10 +103,13 @@ export class Lighting
 
     update()
     {
+        // Offset (TODO: optimise)
+        const offset = new THREE.Vector3(0, 0, -5)
+
         for(const light of this.lights)
         {
-            light.position.setFromSpherical(this.spherical).add(this.game.view.focusPoint.position)
-            light.target.position.copy(this.game.view.focusPoint.position)
+            light.position.setFromSpherical(this.spherical).add(this.game.view.focusPoint.position).add(offset)
+            light.target.position.copy(this.game.view.focusPoint.position).add(offset)
         }
     }
 }
