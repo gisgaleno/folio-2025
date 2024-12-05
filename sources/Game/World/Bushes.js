@@ -213,12 +213,9 @@ export class Bushes
         const totalShadows = this.game.materials.getTotalShadow(this.material)
 
         // Output
-        const colorA = uniform(color('#9eaf33').rgb)
+        const baseColor = uniform(color('#9eaf33').rgb)
 
-        // const colorBase = colorA
-        //     .mul(this.game.lighting.colorUniform.mul(this.game.lighting.intensityUniform))
-
-        this.material.outputNode = this.game.materials.lightOutputNode(colorA, totalShadows)
+        this.material.outputNode = this.game.materials.lightOutputNode(baseColor, totalShadows)
 
         // Bushes
         if(this.game.debug.active)
@@ -228,8 +225,8 @@ export class Bushes
                 expanded: false,
             })
 
-            debugPanel.addBinding({ color: colorA.value.getHex(THREE.SRGBColorSpace) }, 'color', { label: 'colorA', view: 'color' })
-                .on('change', tweak => { colorA.value.set(tweak.value) })
+            debugPanel.addBinding({ color: baseColor.value.getHex(THREE.SRGBColorSpace) }, 'color', { label: 'baseColor', view: 'color' })
+                .on('change', tweak => { baseColor.value.set(tweak.value) })
             debugPanel.addBinding(shadowOffset, 'value', { label: 'shadowOffset', min: 0, max: 2, step: 0.001 })
         }
     }

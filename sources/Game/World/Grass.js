@@ -159,15 +159,17 @@ export class Grass
 
         const baseColor = colorVariation.mix(colorA, colorB).rgb
             .mul(tipness)
+            .varying()
 
-        const shadedColor = baseColor
+        const ligthenColor = baseColor
             .mul(this.game.lighting.colorUniform.mul(this.game.lighting.intensityUniform))
             .varying()
         
-        const shadowColor = baseColor.mul(this.game.materials.shadowColor).rgb
+        const shadowColor = baseColor.mul(this.game.materials.shadowColor).rgb.varying()
         const shadowMix = totalShadows.oneMinus().clamp(0, 1)
+        const shadedColor = mix(ligthenColor, shadowColor, shadowMix)
 
-        this.material.outputNode = vec4(mix(shadedColor, shadowColor, shadowMix), 1)
+        this.material.outputNode = vec4(shadedColor, 1)
 
         // Debug
         if(this.game.debug.active)

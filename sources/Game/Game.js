@@ -42,8 +42,6 @@ export class Game
                     { path: 'playground/playgroundPhysical.glb', type: 'gltf', name: 'playgroundPhysical' },
                     { path: 'floor/keys.png', type: 'texture', name: 'floorKeysTexture' },
                     { path: 'bricksWalls/bricksWalls.glb', type: 'gltf', name: 'bricksWalls' },
-                    // { path: 'blackFriday/fragment.glb', type: 'gltf', name: 'fragment' },
-                    // { path: 'blackFriday/fragments.glb', type: 'gltf', name: 'fragments' },
                 ],
                 (resources) =>
                 {
