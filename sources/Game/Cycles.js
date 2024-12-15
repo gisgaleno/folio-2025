@@ -42,24 +42,25 @@ export class Cycles
     {
         this.day = {}
         this.day.progress = 0
-        this.day.speed = 0.005
+        this.day.speed = 0.01
         this.day.auto = true
 
         const presets = {
             day: { lightColor: new THREE.Color('#ffffff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#0085db'), fogColor: new THREE.Color('#b4fbff'), fogNear: 6, fogFar: 45 },
-            dusk: { lightColor: new THREE.Color('#d12cff'), lightIntensity: 1.2, shadowColor: new THREE.Color('#72125c'), fogColor: new THREE.Color('#564cff'), fogNear: 6, fogFar: 45 },
-            night: { lightColor: new THREE.Color('#0025ff'), lightIntensity: 12,  shadowColor: new THREE.Color('#1d00db'), fogColor: new THREE.Color('#070e29'), fogNear: 0, fogFar: 21 },
+            dusk: { lightColor: new THREE.Color('#ff4141'), lightIntensity: 1.2, shadowColor: new THREE.Color('#840f85'), fogColor: new THREE.Color('#724cff'), fogNear: 6, fogFar: 45 },
+            night: { lightColor: new THREE.Color('#3240ff'), lightIntensity: 3.8,  shadowColor: new THREE.Color('#0032db'), fogColor: new THREE.Color('#070e29'), fogNear: 0, fogFar: 21 },
             dawn: { lightColor: new THREE.Color('#ff9000'), lightIntensity: 1.2,   shadowColor: new THREE.Color('#db4700'), fogColor: new THREE.Color('#ffa385'), fogNear: 6, fogFar: 45 },
         }
 
         this.day.values = this.createInterpolated(
             [
-                { ...presets.day, stop: 0.0 }, // day
-                { ...presets.day, stop: 0.2 }, // day
-                { ...presets.dusk, stop: 0.3 }, // Dusk
-                { ...presets.night, stop: 0.5 }, // Night
-                { ...presets.night, stop: 0.7 }, // Night
-                { ...presets.dawn, stop: 0.9 }, // Dawn
+                { properties: presets.day, stop: 0.0 }, // day
+                { properties: presets.day, stop: 0.15 }, // day
+                { properties: presets.dusk, stop: 0.25 }, // Dusk
+                { properties: presets.night, stop: 0.35 }, // Night
+                { properties: presets.night, stop: 0.6 }, // Night
+                { properties: presets.dawn, stop: 0.8 }, // Dawn
+                { properties: presets.day, stop: 0.9 }, // day
             ],
             this.day,
             'smoothstep'
@@ -107,12 +108,12 @@ export class Cycles
         interpolated.cycles = cycles
         interpolated.interpolation = interpolation
 
-        for(const key in steps[0])
+        for(const key in steps[0].properties)
         {
             if(key !== 'stop')
             {
                 const property = {}
-                property.value = steps[0][key]
+                property.value = steps[0].properties[key]
 
                 if(property.value instanceof THREE.Color)
                 {
@@ -191,11 +192,11 @@ export class Cycles
 
                 if(property.type === 'color')
                 {
-                    property.value.lerpColors(stepPrevious[key], stepNext[key], mixRatio)
+                    property.value.lerpColors(stepPrevious.properties[key], stepNext.properties[key], mixRatio)
                 }
                 else if(property.type === 'number')
                 {
-                    property.value = lerp(stepPrevious[key], stepNext[key], mixRatio)
+                    property.value = lerp(stepPrevious.properties[key], stepNext.properties[key], mixRatio)
                 }
             }
         }
