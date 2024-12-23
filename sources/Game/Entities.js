@@ -1,4 +1,5 @@
 import { Game } from './Game.js'
+import { remapClamp } from './utilities/maths.js'
 
 export class Entities
 {

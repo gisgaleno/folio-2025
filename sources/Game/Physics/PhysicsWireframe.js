@@ -6,7 +6,7 @@ export class PhysicsWireframe
     constructor()
     {
         this.game = Game.getInstance()
-        this.active = true
+        this.active = false
 
         this.geometry = new THREE.BufferGeometry()
         this.geometry.setAttribute('position', new THREE.Float32BufferAttribute([], 3))

@@ -96,6 +96,9 @@ export class Grass
                 0,
         ])
 
+        const terrainData = this.game.materials.terrainDataNode(bladePosition.div(256).add(0.5))
+        const terrainDataGrass = terrainData.g.smoothstep(0.4, 0.6)
+
         this.material.positionNode = Fn(() =>
         {
             // Blade position
@@ -123,10 +126,11 @@ export class Grass
                 .mul(bladeHeightRandomness.mul(attribute('heightRandomness')).add(bladeHeightRandomness.oneMinus()))
                 .mul(heightVariation.r)
                 .mul(wheelsTracksHeight)
+                .mul(terrainDataGrass)
 
             // Shape
             const shape = vec3(
-                bladeShape.element(vertexLoopIndex.mod(3).mul(2)).mul(bladeWidth),
+                bladeShape.element(vertexLoopIndex.mod(3).mul(2)).mul(bladeWidth).mul(terrainDataGrass),
                 bladeShape.element(vertexLoopIndex.mod(3).mul(2).add(1)).mul(height),
                 0
             )
@@ -145,34 +149,41 @@ export class Grass
             return vertexPosition
         })()
 
-        // Normal
-        const normal = vec3(wind.y.mul(-10), 1, wind.y.mul(-10)).normalize()
-        this.material.normalNode = transformNormalToView(normal)
+        // // Normal
+        // const normal = vec3(wind.y.mul(-10), 1, wind.y.mul(-10)).normalize()
+        // this.material.normalNode = transformNormalToView(normal)
+        this.material.normalNode = transformNormalToView(vec3(0, 1, 0))
 
         // Shadow
         const totalShadows = this.game.materials.getTotalShadow(this.material)
 
         // Output
-        const colorA = uniform(color('#72a51e'))
-        const colorB = uniform(color('#e0e239'))
-        const colorVariation = varying(texture(this.game.resources.noisesTexture, bladePosition.mul(0.02)).smoothstep(0.2, 0.8))
+        // baseColor = baseColor.mix(colorA, colorB).rgb
+        //     .mul(tipness)
+        //     .varying()
 
-        const baseColor = colorVariation.mix(colorA, colorB).rgb
-            .mul(tipness)
-            .varying()
+        let baseColor = this.game.materials.terrainColorNode(terrainData)
 
-        const ligthenColor = baseColor
-            .mul(this.game.lighting.colorUniform.mul(this.game.lighting.intensityUniform))
-            .varying()
+        // // Tipness
+        // baseColor = mix(baseColor, color('#9eaf33'), tipness).rgb
+        //     .varying()
+
+        const normal = mix(vec3(0, 1, 0), vec3(1, 1, 1), terrainDataGrass).normalize()
         
-        const shadowColor = baseColor.mul(this.game.materials.shadowColor).rgb.varying()
-        const shadowMix = totalShadows.oneMinus().clamp(0, 1)
-        const shadedColor = mix(ligthenColor, shadowColor, shadowMix)
+        const lightenColor = baseColor.mul(this.game.lighting.colorUniform.mul(this.game.lighting.intensityUniform))
 
-        // Fog
+        const coreShadowMix = normal.normalize().dot(this.game.lighting.directionUniform).smoothstep(this.game.materials.coreShadowEdgeHigh, this.game.materials.coreShadowEdgeLow)
+        const castShadowMix = totalShadows.oneMinus()
+        const tipnessShadowMix = tipness.oneMinus().mul(terrainDataGrass)
+        const combinedShadowMix = max(max(coreShadowMix, castShadowMix), tipnessShadowMix).clamp(0, 1)
+        
+        const shadowColor = baseColor.rgb.mul(this.game.materials.shadowColor).rgb
+        const shadedColor = mix(lightenColor, shadowColor, combinedShadowMix)
+
         const foggedColor = this.game.fog.fogStrength.mix(shadedColor, this.game.fog.fogColor)
 
         this.material.outputNode = vec4(foggedColor, 1)
+        // this.material.outputNode = vec4(this.game.materials.lightOutputNode(baseColor), this.game.materials.getTotalShadow(this.material))
 
         // Debug
         if(this.game.debug.active)
@@ -182,8 +193,8 @@ export class Grass
                 expanded: false,
             })
 
-            this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
-            this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
+            // this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
+            // this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
             debugPanel.addBinding(bladeWidth, 'value', { label: 'bladeWidth', min: 0, max: 1, step: 0.001 })
             debugPanel.addBinding(bladeHeight, 'value', { label: 'bladeHeight', min: 0, max: 2, step: 0.001 })
             debugPanel.addBinding(bladeHeightRandomness, 'value', { label: 'bladeHeightRandomness', min: 0, max: 1, step: 0.001 })

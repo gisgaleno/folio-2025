@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { positionLocal, varying, uv, max, positionWorld, float, Fn, uniform, color, mix, vec3, vec4, normalWorld, texture, vec2, time } from 'three/tsl'
+import { positionLocal, varying, uv, max, positionWorld, float, Fn, uniform, color, mix, vec3, vec4, normalWorld, texture, vec2, time, smoothstep } from 'three/tsl'
 import { Game } from './Game.js'
 import { blendDarken_2 } from './tsl/blendings.js'
 
@@ -180,6 +180,35 @@ export class Materials
 
             return vec4(foggedColor.rgb, 1)
         })
+
+        // Terrain color
+        this.grassColorUniform = uniform(color('#9eaf33'))
+        this.dirtColorUniform = uniform(color('#ffb869'))
+        this.waterSurfaceColorUniform = uniform(color('#00ffea'))
+        this.waterDepthColorUniform = uniform(color('#1800b2'))
+
+        this.terrainDataNode = Fn(([coordinate]) =>
+        {
+            return texture(this.game.resources.terrainTexture, coordinate).rgb
+        })
+        
+        this.terrainColorNode = Fn(([terrainData]) =>
+        {
+            /**
+            * Color
+            */
+            // Dirt color
+            let baseColor = color(this.dirtColorUniform)
+
+            // Grass
+            baseColor = mix(baseColor, this.grassColorUniform, terrainData.g)
+
+            // Water
+            baseColor = mix(baseColor, this.waterSurfaceColorUniform, smoothstep(terrainData.b, 0, 0.1))
+            baseColor = mix(baseColor, this.waterDepthColorUniform, smoothstep(0.1, 1, terrainData.b))
+
+            return baseColor.rgb
+        })
         
         // Debug
         if(this.game.debug.active)
@@ -200,6 +229,12 @@ export class Materials
             this.debugPanel.addBinding(this.cloudsEdgeLow, 'value', { label: 'cloudsEdgeLow', min: 0, max: 1, step: 0.001 })
             this.debugPanel.addBinding(this.cloudsEdgeHigh, 'value', { label: 'cloudsEdgeHigh', min: 0, max: 1, step: 0.001 })
             this.debugPanel.addBinding(this.cloudsEdgeMultiplier, 'value', { label: 'cloudsEdgeMultiplier', min: 0, max: 1, step: 0.001 })
+
+            this.debugPanel.addBlade({ view: 'separator' })
+            this.game.debug.addThreeColorBinding(this.debugPanel, this.grassColorUniform.value, 'grassColor')
+            this.game.debug.addThreeColorBinding(this.debugPanel, this.dirtColorUniform.value, 'dirtColorUniform')
+            this.game.debug.addThreeColorBinding(this.debugPanel, this.waterSurfaceColorUniform.value, 'waterSurfaceColorUniform')
+            this.game.debug.addThreeColorBinding(this.debugPanel, this.waterDepthColorUniform.value, 'waterDepthColorUniform')
         }
     }
 

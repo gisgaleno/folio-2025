@@ -1,6 +1,7 @@
 import { Game } from '../Game.js'
 import RAPIER from '@dimforge/rapier3d-compat'
 import { PhysicsWireframe } from './PhysicsWireframe.js'
+import { remapClamp } from '../utilities/maths.js'
 
 export class Physics
 {
@@ -9,6 +10,11 @@ export class Physics
         this.game = Game.getInstance()
 
         this.world = new RAPIER.World({ x: 0.0, y: -9.81, z: 0.0 })
+
+        this.water = {}
+        this.water.edgeLow = 0
+        this.water.edgeHigh = -0.4
+        this.water.gravityMultiplier = - 0.75
 
         // this.world.integrationParameters.numSolverIterations = 4 // 4
         // this.world.numAdditionalFrictionIterations = 0 // 0
@@ -36,6 +42,10 @@ export class Physics
                 expanded: false,
             })
             this.debugPanel.addBinding(this.world.gravity, 'y', { min: - 20, max: 20, step: 0.01 })
+            this.debugPanel.addBlade({ view: 'separator' })
+            this.debugPanel.addBinding(this.water, 'edgeLow', { label: 'waterEdgeLow', min: -1, max: 0 })
+            this.debugPanel.addBinding(this.water, 'edgeHigh', { label: 'waterEdgeHigh', min: -1, max: 0 })
+            this.debugPanel.addBinding(this.water, 'gravityMultiplier', { label: 'waterGravityMultiplier', min: -1, max: 1 })
         }
     }
 
@@ -78,6 +88,8 @@ export class Physics
                 colliderDescription = colliderDescription.cuboid(..._colliderDescription.parameters)
             else if(_colliderDescription.shape === 'trimesh')
                 colliderDescription = colliderDescription.trimesh(..._colliderDescription.parameters)
+            else if(_colliderDescription.shape === 'heightfield')
+                colliderDescription = colliderDescription.heightfield(..._colliderDescription.parameters)
 
             if(_colliderDescription.position)
                 colliderDescription = colliderDescription.setTranslation(_colliderDescription.position.x, _colliderDescription.position.y, _colliderDescription.position.z)
@@ -107,6 +119,13 @@ export class Physics
         this.world.vehicleControllers.forEach((_vehicleController) =>
         {
             _vehicleController.updateVehicle(this.game.time.delta)
+        })
+    
+        this.world.bodies.forEach((_child) =>
+        {
+            const position = _child.translation()
+            const waterGravity = remapClamp(position.y, this.water.edgeLow, this.water.edgeHigh, 1, this.water.gravityMultiplier)
+            _child.setGravityScale(waterGravity)
         })
         
         this.world.step()
