@@ -8,9 +8,11 @@ export class Lighting
     {
         this.game = Game.getInstance()
 
-        this.cyclesBased = true
-        this.phi = 1.34
-        this.theta = Math.PI * 0.35
+        this.useCycles = true
+        this.phi = 0.73
+        this.theta = 0.72
+        this.phiAmplitude = 0.82
+        this.thetaAmplitude = 1
         this.spherical = new THREE.Spherical(25, this.phi, this.theta)
         this.direction = new THREE.Vector3().setFromSpherical(this.spherical).normalize()
         this.directionUniform = uniform(this.direction)
@@ -38,12 +40,16 @@ export class Lighting
         if(this.game.debug.active)
         {
             const debugPanel = this.game.debug.panel.addFolder({
-                title: '💡 Lights',
+                title: '💡 Lighting',
                 expanded: false,
             })
 
-            debugPanel.addBinding(this.spherical, 'phi', { min: 0, max: Math.PI * 0.5 }).on('change', () => this.updateCoordinates())
-            debugPanel.addBinding(this.spherical, 'theta', { min: - Math.PI, max: Math.PI }).on('change', () => this.updateCoordinates())
+            debugPanel.addBinding(this.helper, 'visible', { label: 'helperVisible' })
+            debugPanel.addBinding(this, 'useCycles')
+            debugPanel.addBinding(this, 'phi', { min: 0, max: Math.PI * 0.5 }).on('change', () => this.updateCoordinates())
+            debugPanel.addBinding(this, 'theta', { min: - Math.PI, max: Math.PI }).on('change', () => this.updateCoordinates())
+            debugPanel.addBinding(this, 'phiAmplitude', { min: 0, max: Math.PI}).on('change', () => this.updateCoordinates())
+            debugPanel.addBinding(this, 'thetaAmplitude', { min: - Math.PI, max: Math.PI }).on('change', () => this.updateCoordinates())
             debugPanel.addBinding(this.spherical, 'radius', { min: 0, max: 100 }).on('change', () => this.updateCoordinates())
             debugPanel.addBlade({ view: 'separator' })
             debugPanel.addBinding(this, 'near', { min: 0.1, max: 50, step: 0.1 }).on('change', () => this.updateShadow())
@@ -80,10 +86,20 @@ export class Lighting
     setHelper()
     {
         this.helper = new THREE.Mesh(
-            new THREE.IcosahedronGeometry(0.25, 3),
+            new THREE.IcosahedronGeometry(0.25, 1),
             new THREE.MeshBasicNodeMaterial({ wireframe: true })
         )
         this.helper.visible = false
+
+        const points = [
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0, 5),
+        ]
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(points)
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff })
+        const line = new THREE.Line(lineGeometry, lineMaterial)
+        this.helper.add(line)
+
         this.game.scene.add(this.helper)
     }
 
@@ -117,10 +133,10 @@ export class Lighting
 
     update()
     {
-        if(this.cyclesBased)
+        if(this.useCycles)
         {
-            this.spherical.theta = this.theta + Math.sin((this.game.cycles.day.progress + 1/16) * Math.PI * 2) * 0.5
-            this.spherical.phi = Math.PI * 0.44 - (Math.cos((this.game.cycles.day.progress + 1/16) * Math.PI * 2) * 0.5 + 0.5) * 0.2
+            this.spherical.theta = this.theta + Math.sin(- (this.game.cycles.day.progress + 9/16) * Math.PI * 2) * this.thetaAmplitude
+            this.spherical.phi = this.phi + (Math.cos(- (this.game.cycles.day.progress + 9/16) * Math.PI * 2) * 0.5) * this.phiAmplitude
         }
         else
         {
@@ -140,7 +156,7 @@ export class Lighting
         }
 
         // Helper
-        this.helper.position.copy(this.direction).multiplyScalar(10).add(this.game.view.focusPoint.position)
+        this.helper.position.copy(this.direction).multiplyScalar(5).add(this.game.view.focusPoint.position)
         this.helper.lookAt(this.game.view.focusPoint.position)
 
         // Apply day cycles values
