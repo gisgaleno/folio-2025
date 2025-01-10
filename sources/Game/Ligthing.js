@@ -124,7 +124,7 @@ export class Lighting
 
                     // Bounce color
                     const bounceOrientation = normalWorld.dot(vec3(0, - 1, 0)).smoothstep(this.lightBounceEdgeLow, this.lightBounceEdgeHigh)
-                    const bounceDistance = this.lightBounceDistance.sub(positionWorld.y).div(this.lightBounceDistance).max(0).pow(2)
+                    const bounceDistance = this.lightBounceDistance.sub(max(0, positionWorld.y)).div(this.lightBounceDistance).max(0).pow(2)
                     // const bounceWater = positionWorld.y.step(-0.3).mul(0.9).add(1)
                     const bounceColor = this.game.terrainData.colorNode(terrainData)
                     baseColor.assign(mix(baseColor, bounceColor, bounceOrientation.mul(bounceDistance).mul(this.lightBounceMultiplier)))
@@ -133,9 +133,10 @@ export class Lighting
                 // Water
                 if(withWater)
                 {
+                    const waterStep = positionWorld.y.step(this.waterThreshold)
                     const waterMix = positionWorld.y
                         .remapClamp(this.waterThreshold, this.waterThreshold.sub(this.waterAmplitude), 1, 0)
-                        .mul(positionWorld.y.step(this.waterThreshold))
+                        .mul(waterStep)
                         .pow(this.waterPower)
                     
                     baseColor.assign(mix(baseColor, color('#ffffff'), waterMix))
