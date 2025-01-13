@@ -34,10 +34,10 @@ export class DayCycles
 
     setDay()
     {
-        this.progress = 0
+        this.progress = 0.22
         this.manualProgress = this.progress
         this.manualProgressChanged = true
-        this.speed = 0.01
+        this.speed = 0.002
         this.auto = true
 
         const presets = {

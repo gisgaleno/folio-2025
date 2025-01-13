@@ -1,7 +1,8 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { color, float, Fn, instance, instancedBufferAttribute, instanceIndex, luminance, mix, positionLocal, texture, uniform, uniformArray, uv, vec3, vec4 } from 'three/tsl'
+import { color, float, Fn, hash, instance, instancedBufferAttribute, instanceIndex, luminance, mix, PI2, positionLocal, sin, storage, texture, time, uniform, uniformArray, uv, vec3, vec4 } from 'three/tsl'
 import { remap, smoothstep } from '../utilities/maths.js'
+import gsap from 'gsap'
 
 export class PoleLights
 {
@@ -22,6 +23,8 @@ export class PoleLights
 
         this.setBase()
         this.setEmissives()
+        this.setFireflies()
+        this.setSwitchInterval()
 
         this.game.time.events.on('tick', () =>
         {
@@ -56,7 +59,54 @@ export class PoleLights
 
         this.emissives.offMaterial = this.emissives.items[0].material
         this.emissives.onMaterial = this.game.materials.createEmissive('emissivePoleLight', '#ff8641', 3, this.debugPanel)
+    }
 
+    setFireflies()
+    {
+        this.firefliesScale = uniform(0)
+
+        const countPerLight = 5
+        const count = this.emissives.items.length * countPerLight
+        const positions = new Float32Array(count * 3)
+
+        let i = 0
+        for(const emissive of this.emissives.items)
+        {
+            for(let j = 0; j < countPerLight; j++)
+            {
+                const i3 = i * 3
+
+                const angle = Math.random() * Math.PI * 2
+                positions[i3 + 0] = emissive.position.x + Math.cos(angle)
+                positions[i3 + 1] = emissive.position.y
+                positions[i3 + 2] = emissive.position.z + Math.sin(angle)
+                i++
+            }
+        }
+
+        const positionAttribute = storage(new THREE.StorageInstancedBufferAttribute(positions, 3), 'vec3', count).toAttribute()
+
+        const material = new THREE.SpriteNodeMaterial({ color: this.emissives.onMaterial.color })
+
+        const baseTime = time.add(hash(instanceIndex).mul(999))
+        const flyOffset = vec3(
+            sin(baseTime.mul(0.4)).mul(0.5),
+            sin(baseTime).mul(0.2),
+            sin(baseTime.mul(0.3)).mul(0.5)
+        )
+        material.positionNode = positionAttribute.add(flyOffset)
+        material.scaleNode = this.firefliesScale
+
+        const geometry = new THREE.PlaneGeometry(0.03, 0.03)
+
+        const mesh = new THREE.Mesh(geometry, material)
+        mesh.count = count
+        mesh.frustumCulled = false
+        this.game.scene.add(mesh)
+    }
+
+    setSwitchInterval()
+    {
         this.game.dayCycles.addIntervalEvent('poleLightsOn', 0.25, 0.7)
 
         this.game.dayCycles.events.on('poleLightsOn', (inInverval) =>
@@ -65,11 +115,15 @@ export class PoleLights
             {
                 for(const emissive of this.emissives.items)
                     emissive.material = this.emissives.onMaterial
+
+                gsap.to(this.firefliesScale, { value: 1, duration: 5 })
             }
             else
             {
                 for(const emissive of this.emissives.items)
                     emissive.material = this.emissives.offMaterial
+
+                gsap.to(this.firefliesScale, { value: 0, duration: 5, overwrite: true })
             }
         })
     }

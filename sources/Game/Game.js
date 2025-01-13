@@ -76,6 +76,7 @@ export class Game
                 ],
                 (resources) =>
                 {
+                    console.log('loaded')
                     this.resources = resources
 
                     this.resources.terrainTexture.flipY = false
