@@ -22,7 +22,7 @@ export class View
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '📷 View',
-                expanded: true,
+                expanded: false,
             })
 
             this.debugPanel.addBinding(
@@ -255,7 +255,7 @@ export class View
         {
             const rollDebugPanel = this.debugPanel.addFolder({
                 title: 'Roll',
-                expanded: true,
+                expanded: false,
             })
             rollDebugPanel
                 .addButton({ title: 'kick' })

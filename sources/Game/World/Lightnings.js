@@ -12,6 +12,7 @@ export class Lightnings
 
         this.nightChances = 0.25
         this.hitChances = 0
+        this.frequency = 10
 
         // Debug
         if(this.game.debug.active)
@@ -23,6 +24,7 @@ export class Lightnings
 
             this.debugPanel.addBinding(this, 'nightChances', { min: 0, max: 1, step: 0.001 })
             this.hitChancesTweak = this.debugPanel.addBinding(this, 'hitChances', { min: 0, max: 1, step: 0.001 })
+            this.debugPanel.addBinding(this, 'frequency', { min: 0.1, max: 10, step: 0.1 })
 
             this.game.debug.addButtons(
                 this.debugPanel,
@@ -398,7 +400,7 @@ export class Lightnings
             if(Math.random() < this.hitChances)
                 this.createRandom()
 
-            gsap.delayedCall(1, tryCreate)
+            gsap.delayedCall(1 / this.frequency, tryCreate)
         }
 
         tryCreate()
