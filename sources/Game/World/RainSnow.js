@@ -160,7 +160,7 @@ export class RainSnow
             return
 
         const optimalAreaPosition = this.game.view.optimalArea.position
-        const cameraPosition = this.game.view.camera.position
+        const cameraPosition = this.game.view.defaultCamera.position
         const focusPoint = optimalAreaPosition.clone().lerp(cameraPosition, 0.5)
         this.focusPoint.value.set(focusPoint.x, focusPoint.z)
 
