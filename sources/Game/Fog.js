@@ -23,7 +23,7 @@ export class Fog
         this.near = uniform(this.game.view.optimalArea.nearDistance)
         this.far = uniform(this.game.view.optimalArea.farDistance)
         this.strength = rangeFogFactor(this.near, this.far)
-        this.strength = float(0)
+        // this.strength = float(1)
 
         this.game.ticker.events.on('tick', () =>
         {

@@ -39,9 +39,7 @@ export class Field
         // Geometry
         const geometry = new THREE.PlaneGeometry(this.size, this.size, this.subdivisions, this.subdivisions)
         geometry.rotateX(-Math.PI * 0.5)
-        // geometry.deleteAttribute('uv')
         geometry.deleteAttribute('normal')
-        console.log(geometry.attributes.position)
 
         // Material
         const material = new THREE.MeshLambertNodeMaterial({ color: '#000000', wireframe: false })

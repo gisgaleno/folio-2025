@@ -71,7 +71,7 @@ export class Grass
     {
         this.material = new THREE.MeshLambertMaterial()
         this.center = uniform(new THREE.Vector2())
-        this.groundDataDelta = uniform(new THREE.Vector2())
+        // this.groundDataDelta = uniform(new THREE.Vector2())
 
         const vertexLoopIndex = varying(vertexIndex.toFloat().mod(3))
         const tipness = varying(vertexLoopIndex.step(0.5))
@@ -198,10 +198,10 @@ export class Grass
     {
         this.center.value.set(this.game.view.optimalArea.position.x, this.game.view.optimalArea.position.z)
 
-        // Ground data delta
-        this.groundDataDelta.value.set(
-            this.center.value.x - this.game.groundData.focusPoint.x,
-            this.center.value.y - this.game.groundData.focusPoint.y
-        )
+        // // Ground data delta
+        // this.groundDataDelta.value.set(
+        //     this.center.value.x - this.game.groundData.focusPoint.x,
+        //     this.center.value.y - this.game.groundData.focusPoint.y
+        // )
     }
 }
