@@ -122,8 +122,8 @@ export class Lighting
                 // Water
                 if(withWater)
                 {
-                    const waterStep = positionWorld.y.sub(this.waterThreshold).abs().step(this.waterAmplitude)
-                    baseColor.assign(mix(baseColor, color('#ffffff'), waterStep))
+                    const nearWaterSurface = positionWorld.y.sub(this.waterThreshold).abs().greaterThan(this.waterAmplitude)
+                    baseColor.assign(nearWaterSurface.select(baseColor, color('#ffffff')))
                 }
 
                 // Light
