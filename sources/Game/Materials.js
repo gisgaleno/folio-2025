@@ -19,6 +19,11 @@ export class Materials
 
         this.setLuminance()
         this.setPreviews()
+
+        this.createEmissiveGradient('emissiveGradientWarm', '#ff8641', '#ff3e00', 6, this.debugPanel.addFolder({ title: 'emissiveGradientWarm' }))
+        this.createGradient('carRed', '#ff3a3a', '#721551', this.debugPanel.addFolder({ title: 'carRed' }))
+        this.createEmissive('emissiveOrange', '#ff3e00', 3, this.debugPanel.addFolder({ title: 'emissiveOrange' }))
+        this.createEmissive('emissiveRed', '#ff3131', 3, this.debugPanel.addFolder({ title: 'emissiveRed' }))
     }
 
     setLuminance()
@@ -36,29 +41,53 @@ export class Materials
     // Create materials functions
     createEmissive(_name = 'material', _color = '#ffffff', _intensity = 3, debugPanel = null)
     {
-        const threeColor = new THREE.Color(_color)
+        const baseColor = uniform(color(_color))
+        const intensity = uniform(_intensity)
 
-        const dummy = {}
-        dummy.color = threeColor.getHex(THREE.SRGBColorSpace)
-        dummy.intensity = _intensity
-
-        const material = new THREE.MeshBasicNodeMaterial({ color: threeColor, transparent: true })
+        const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
         material.fog = false
         this.save(_name, material)
-        
-        const update = () =>
+  
+        if(this.game.debug.active && debugPanel)
         {
-            material.color.set(dummy.color)
-            material.color.multiplyScalar(dummy.intensity / this.luminance.get(material.color))
+            this.game.debug.addThreeColorBinding(debugPanel, baseColor.value, 'color')
+            debugPanel.addBinding(intensity, 'value', { min: 0, max: 10, step: 0.01 })
         }
 
-        update()
+        return material
+    }
+
+    createEmissiveGradient(_name = 'material', _colorA = '#ffffff', _colorB = '#ff0000', _intensity = 3, debugPanel = null)
+    {
+        const colorA = uniform(color(_colorA))
+        const colorB = uniform(color(_colorB))
+        const intensity = uniform(_intensity)
+
+        const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
+        material.colorNode = mix(colorA, colorB, uv().sub(0.5).length().mul(2)).mul(intensity)
+        material.fog = false
+        this.save(_name, material)
 
         if(this.game.debug.active && debugPanel)
         {
-            debugPanel.addBinding(dummy, 'intensity', { min: 0, max: 10, step: 0.01 }).on('change', update)
-            debugPanel.addBinding(dummy, 'color', { view: 'color' }).on('change', update)
+            this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
+            this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
+            debugPanel.addBinding(intensity, 'value', { min: 0, max: 10, step: 0.01 })
         }
+        
+        // const update = () =>
+        // {
+        //     material.color.set(dummy.color)
+        //     material.color.multiplyScalar(dummy.intensity / this.luminance.get(material.color))
+        // }
+
+        // update()
+
+        // if(this.game.debug.active && debugPanel)
+        // {
+        //     debugPanel.addBinding(dummy, 'intensity', { min: 0, max: 10, step: 0.01 }).on('change', update)
+        //     debugPanel.addBinding(dummy, 'color', { view: 'color' }).on('change', update)
+        // }
 
         return material
     }

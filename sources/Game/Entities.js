@@ -65,8 +65,6 @@ export class Entities
                 collider.shape = 'cuboid'
                 collider.parameters = [ physical.scale.x * 0.5, physical.scale.y * 0.5, physical.scale.z * 0.5 ]
             }
-            console.log(collider)
-
 
             colliders.push(collider)
         }

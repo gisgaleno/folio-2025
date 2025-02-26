@@ -41,11 +41,6 @@ export class Vehicle
         this.absoluteSpeed = 0
         this.upsideDownRatio = 0
 
-        this.game.materials.createGradient('carRed', '#ff3a3a', '#721551', this.chassisDebugPanel)
-        this.game.materials.createEmissive('emissiveWarnWhite', '#ff8641', 3, this.headlightsDebugPanel)
-        this.game.materials.createEmissive('emissiveOrange', '#ff3e00', 3, this.headlightsDebugPanel)
-        this.game.materials.createEmissive('emissiveRed', '#ff3131', 3, this.headlightsDebugPanel)
-
         this.setParts()
         this.setChassis()
         this.controller = this.game.physics.world.createVehicleController(this.chassis.entity.physical.body)

@@ -56,9 +56,10 @@ export class PoleLights
             if(_child.isMesh && _child.name.startsWith('poleLightEmissive'))
                 this.emissives.items.push(_child)
         })
+        console.log(this.emissives.items)
 
-        this.emissives.offMaterial = this.emissives.items[0].material
-        this.emissives.onMaterial = this.game.materials.createEmissive('emissivePoleLight', '#ff8641', 3, this.debugPanel)
+        this.emissives.offMaterial = this.game.materials.getFromName('glass')
+        this.emissives.onMaterial = this.game.materials.getFromName('emissiveGradientWarm')
     }
 
     setFireflies()
