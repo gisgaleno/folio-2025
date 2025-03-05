@@ -39,6 +39,26 @@ html, body, .game, .modals
     -moz-osx-font-smoothing: grayscale;
 }
 
+.fonts-loader
+{
+    position: fixed;
+    top: 100%;
+    left: 0;
+}
+
+.fonts-loader .nunito
+{
+    font-family: "Nunito", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+.fonts-loader .amatic-sc
+{
+    font-family: "Amatic SC", sans-serif;
+    font-weight: 700;
+}
+
 .title
 {
     margin-bottom: 0.25em;
