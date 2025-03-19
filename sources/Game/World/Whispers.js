@@ -259,23 +259,28 @@ export class Whispers
 
         const modalItem = this.game.modals.items.get('whispers')
         this.modal.element = modalItem.element
-        this.modal.inputElement = modalItem.mainFocus
         this.modal.inputGroupElement = this.modal.element.querySelector('.js-input-group')
+        this.modal.inputElement = this.modal.inputGroupElement.querySelector('.js-input')
         this.modal.previewMessageElement = this.modal.element.querySelector('.js-preview-message')
 
         const submit = () =>
         {
-            // Insert
-            this.game.server.send({
-                type: 'whispersInsert',
-                message: this.modal.inputElement.value,
-                x: this.game.vehicle.position.x,
-                y: this.game.vehicle.position.y,
-                z: this.game.vehicle.position.z
-            })
+            const sanatized = this.modal.inputElement.value.trim().substring(0, this.count)
+            
+            if(sanatized.length)
+            {
+                // Insert
+                this.game.server.send({
+                    type: 'whispersInsert',
+                    message: sanatized,
+                    x: this.game.vehicle.position.x,
+                    y: this.game.vehicle.position.y,
+                    z: this.game.vehicle.position.z
+                })
 
-            // Close modal
-            this.game.modals.close()
+                // Close modal
+                this.game.modals.close()
+            }
         }
 
         const updateGroup = () =>
