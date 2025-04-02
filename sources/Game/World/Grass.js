@@ -96,7 +96,7 @@ export class Grass
                 0,
         ])
 
-        const hiddenThreshold = 0.02
+        const hiddenThreshold = 0.1
         // const terrainUv = this.game.terrainData.worldPositionToUvNode(bladePosition)
         const terrainData = this.game.terrainData.terrainDataNode(bladePosition)
         const terrainDataGrass = terrainData.g.smoothstep(0.4, 0.6)
