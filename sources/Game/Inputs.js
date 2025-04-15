@@ -83,13 +83,18 @@ export class Inputs
             return true
 
         // Has filter but no category on map => Forbid
-        if(!map.category)
+        if(map.categories.length === 0)
             return false
 
-        if(this.filters.indexOf(map.category) === -1)
-            return false
+        // Has matching category and filter => All
+        for(const category of map.categories)
+        {
+            if(this.filters.indexOf(category) !== -1)
+                return true
+        }
 
-        return true
+        // Otherwise => Forbid
+        return false
     }
 
     down(key)

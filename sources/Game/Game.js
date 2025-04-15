@@ -125,31 +125,31 @@ export class Game
         this.ticker = new Ticker()
         this.inputs = new Inputs([
             // Vehicle
-            { name: 'forward',               category: 'vehicle', keys: [ 'ArrowUp', 'KeyW' ] },
-            { name: 'right',                 category: 'vehicle', keys: [ 'ArrowRight', 'KeyD' ] },
-            { name: 'backward',              category: 'vehicle', keys: [ 'ArrowDown', 'KeyS' ] },
-            { name: 'left',                  category: 'vehicle', keys: [ 'ArrowLeft', 'KeyA' ] },
-            { name: 'boost',                 category: 'vehicle', keys: [ 'ShiftLeft', 'ShiftRight' ] },
-            { name: 'brake',                 category: 'vehicle', keys: [ 'KeyB' ] },
-            { name: 'respawn',               category: 'vehicle', keys: [ 'KeyR' ] },
-            { name: 'suspensions',           category: 'vehicle', keys: [ 'Numpad5', 'Space' ] },
-            { name: 'suspensionsFront',      category: 'vehicle', keys: [ 'Numpad8' ] },
-            { name: 'suspensionsBack',       category: 'vehicle', keys: [ 'Numpad2' ] },
-            { name: 'suspensionsRight',      category: 'vehicle', keys: [ 'Numpad6' ] },
-            { name: 'suspensionsLeft',       category: 'vehicle', keys: [ 'Numpad4' ] },
-            { name: 'suspensionsFrontLeft',  category: 'vehicle', keys: [ 'Numpad7' ] },
-            { name: 'suspensionsFrontRight', category: 'vehicle', keys: [ 'Numpad9' ] },
-            { name: 'suspensionsBackRight',  category: 'vehicle', keys: [ 'Numpad3' ] },
-            { name: 'suspensionsBackLeft',   category: 'vehicle', keys: [ 'Numpad1' ] },
-            { name: 'whisper',               category: 'vehicle', keys: [ 'KeyT' ] },
-            { name: 'interact',              category: 'vehicle', keys: [ 'Enter' ] },
+            { name: 'forward',               categories: [ 'playing' ], keys: [ 'ArrowUp', 'KeyW' ] },
+            { name: 'right',                 categories: [ 'playing' ], keys: [ 'ArrowRight', 'KeyD' ] },
+            { name: 'backward',              categories: [ 'playing' ], keys: [ 'ArrowDown', 'KeyS' ] },
+            { name: 'left',                  categories: [ 'playing' ], keys: [ 'ArrowLeft', 'KeyA' ] },
+            { name: 'boost',                 categories: [ 'playing' ], keys: [ 'ShiftLeft', 'ShiftRight' ] },
+            { name: 'brake',                 categories: [ 'playing' ], keys: [ 'KeyB' ] },
+            { name: 'respawn',               categories: [ 'playing' ], keys: [ 'KeyR' ] },
+            { name: 'suspensions',           categories: [ 'playing' ], keys: [ 'Numpad5', 'Space' ] },
+            { name: 'suspensionsFront',      categories: [ 'playing' ], keys: [ 'Numpad8' ] },
+            { name: 'suspensionsBack',       categories: [ 'playing' ], keys: [ 'Numpad2' ] },
+            { name: 'suspensionsRight',      categories: [ 'playing' ], keys: [ 'Numpad6' ] },
+            { name: 'suspensionsLeft',       categories: [ 'playing' ], keys: [ 'Numpad4' ] },
+            { name: 'suspensionsFrontLeft',  categories: [ 'playing' ], keys: [ 'Numpad7' ] },
+            { name: 'suspensionsFrontRight', categories: [ 'playing' ], keys: [ 'Numpad9' ] },
+            { name: 'suspensionsBackRight',  categories: [ 'playing' ], keys: [ 'Numpad3' ] },
+            { name: 'suspensionsBackLeft',   categories: [ 'playing' ], keys: [ 'Numpad1' ] },
+            { name: 'whisper',               categories: [ 'playing' ], keys: [ 'KeyT' ] },
+            { name: 'interact',              categories: [ 'playing' ], keys: [ 'Enter' ] },
 
             // UI
-            { name: 'close',                category: 'ui', keys: [ 'Escape' ] },
+            { name: 'close',                 categories: [ 'ui', 'playing' ], keys: [ 'Escape' ] },
 
             // Debug
-            { name: 'viewToggle',           category: 'debug', keys: [ 'KeyV' ] },
-            { name: 'debugToggle',          category: 'debug', keys: [ 'KeyH' ] },
+            { name: 'viewToggle',            categories: [ 'debug' ], keys: [ 'KeyV' ] },
+            { name: 'debugToggle',           categories: [ 'debug' ], keys: [ 'KeyH' ] },
         ])
         this.debug = new Debug()
         this.time = new Time()

@@ -10,6 +10,7 @@ export class Modals
         this.element = document.querySelector('.js-modals')
         this.current = null
         this.pending = null
+        this.default = null
 
         this.setClose()
         this.setItems()
@@ -57,13 +58,18 @@ export class Modals
         for(const element of elements)
         {
             const name = element.dataset.name
+
             const item = {
                 name: name,
                 element: element,
                 mainFocus: element.querySelector('.js-main-focus'),
                 events: new Events()
             }
+
             this.items.set(name, item)
+
+            if(typeof element.dataset.default !== 'undefined')
+                this.default = item
         }
     }
 
@@ -84,8 +90,16 @@ export class Modals
         {
             if(event.down)
             {
-                this.pending = null
-                this.close()
+                if(this.visible)
+                {
+                    this.pending = null
+                    this.close()
+                }
+                else
+                {
+                    if(this.default)
+                        this.open(this.default.name)
+                }
             }
         })
     }

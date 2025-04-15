@@ -11,9 +11,14 @@ export class Intro
 
         this.setInteractiveArea()
 
+        let firstTimeIntro = true
+
         this.game.modals.items.get('intro').events.on('close', () =>
         {
-            this.game.audio.music.play()
+            if(firstTimeIntro)
+                this.game.audio.music.play()
+            
+            firstTimeIntro = false
         })
     }
 
