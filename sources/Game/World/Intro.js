@@ -10,6 +10,11 @@ export class Intro
         this.interactiveAreaPosition = interactiveAreaPosition
 
         this.setInteractiveArea()
+
+        this.game.modals.items.get('intro').events.on('close', () =>
+        {
+            this.game.audio.music.play()
+        })
     }
 
     setInteractiveArea()

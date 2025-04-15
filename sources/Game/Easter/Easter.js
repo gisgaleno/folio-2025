@@ -154,10 +154,13 @@ export class Easter
 
         this.eggs.catch = (egg) =>
         {
-            // this.game.sounds.eggs.catch()
             egg.catch()
             this.eggs.updateTitle()
-            this.eggs.testOver()
+            const isOver = this.eggs.testOver()
+
+            this.game.audio.sounds.ding.volume(isOver ? 0.5 : 0.2)
+            this.game.audio.sounds.ding.play()
+            this.game.audio.sounds.swoosh.play()
         }
 
         this.eggs.updateTitle = () =>
@@ -177,6 +180,12 @@ export class Easter
             if(this.eggs.allCaught)
             {
                 this.game.modals.open('easter-end')
+
+                return true
+            }
+            else
+            {
+                return false
             }
         }
     }

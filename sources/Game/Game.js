@@ -34,6 +34,7 @@ import { Overlay } from './Overlay.js'
 import { Tornado } from './Tornado.js'
 import { InteractiveAreas } from './InteractiveAreas2.js'
 import { Respawns } from './Respawns.js'
+import { Audio } from './Audio.js'
 
 export class Game
 {
@@ -158,7 +159,7 @@ export class Game
         this.rendering = new Rendering(() =>
         {
             this.noises = new Noises()
-            // this.sounds = new Sounds()
+            this.audio = new Audio()
             this.dayCycles = new DayCycles()
             this.yearCycles = new YearCycles()
             this.weather = new Weather()

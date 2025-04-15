@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from './Game.js'
-import { bool, color, float, Fn, If, mix, positionGeometry, texture, uniform, vec2, vec3, vec4, viewportBottomLeft, viewportCoordinate, viewportSize, viewportTopLeft } from 'three/tsl'
+import { bool, color, float, Fn, If, mix, positionGeometry, texture, uniform, vec2, vec3, vec4, viewportBottomLeft, viewportCoordinate, viewportSize, screenUV } from 'three/tsl'
 import gsap from 'gsap'
 
 export class Overlay
@@ -44,7 +44,7 @@ export class Overlay
             // this.progress.lessThan(mask).discard()
 
             // Gradient
-            const colorMix = viewportTopLeft.length()
+            const colorMix = screenUV.length()
             // return vec4(vec3(float(1).step(colorMix)), 1)
             const finalColor = mix(colorA, colorB, colorMix)
 

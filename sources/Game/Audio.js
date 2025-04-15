@@ -2,26 +2,20 @@ import { Howl, Howler } from 'howler'
 import { Game } from './Game.js'
 import { remap, remapClamp } from './utilities/maths.js'
 
-export class Sounds
+export class Audio
 {
     constructor()
     {
         this.game = Game.getInstance()
 
         this.setMusic()
-        this.setFragments()
+        this.setSounds()
         this.setMuteToggle()
 
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 12)
-    }
-
-    start()
-    {
-        this.music.play()
-        this.fragments.ambiance.play()
     }
 
     setMusic()
@@ -35,24 +29,24 @@ export class Sounds
         })
     }
 
-    setFragments()
+    setSounds()
     {
-        this.fragments = {}
-        this.fragments.ding = new Howl({
+        this.sounds = {}
+        this.sounds.ding = new Howl({
             src: ['sounds/Bell-with-a-Boom_TTX022103.mp3'],
             pool: 1,
             autoplay: false,
             loop: false,
             volume: 0.5
         })
-        this.fragments.swoosh = new Howl({
+        this.sounds.swoosh = new Howl({
             src: ['sounds/Magic Game Pack a Punch 3.mp3'],
             pool: 1,
             autoplay: false,
             loop: false,
             volume: 1
         })
-        this.fragments.ambiance = new Howl({
+        this.sounds.ambiance = new Howl({
             src: ['sounds/Mountain Audio - Small Chimes - Loop.mp3'],
             pool: 1,
             autoplay: false,
@@ -60,12 +54,12 @@ export class Sounds
             volume: 0.25
         })
 
-        this.fragments.catch = () =>
+        this.sounds.catch = () =>
         {
-            this.fragments.ding.play()
+            this.sounds.ding.play()
             setTimeout(() =>
             {
-                this.fragments.swoosh.play()
+                this.sounds.swoosh.play()
             }, 1350)
         }
     }
@@ -111,18 +105,18 @@ export class Sounds
         if(soundToggleLocal !== null && soundToggleLocal === '0')
             this.muteToggle.deactivate()
 
-        this.muteToggle.buttonElement.addEventListener('click', this.muteToggle.toggle)
+        // this.muteToggle.buttonElement.addEventListener('click', this.muteToggle.toggle)
     }
 
     update()
     {
-        // Fragments
-        const closestFragment = this.game.blackFriday.fragments.closest
-        let volume = 0
+        // // Fragments
+        // const closestFragment = this.game.blackFriday.fragments.closest
+        // let volume = 0
 
-        if(closestFragment)
-            volume = remapClamp(closestFragment.distance, 2, 50, 0.25, 0)
+        // if(closestFragment)
+        //     volume = remapClamp(closestFragment.distance, 2, 50, 0.25, 0)
 
-        this.fragments.ambiance.volume(volume)
+        // this.sounds.ambiance.volume(volume)
     }
 }
