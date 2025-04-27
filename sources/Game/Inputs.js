@@ -6,17 +6,23 @@ import { Game } from './Game.js'
 
 export class Inputs
 {
-    constructor(_map)
+    constructor(_map = [])
     {
         this.game = Game.getInstance()
         this.events = new Events()
 
-        this.map = _map
+        this.map = []
         this.filters = []
 
         this.setKeys()
         this.setPointer()
         this.setWheel()
+        this.addMap(_map)
+    }
+
+    addMap(_map)
+    {
+        this.map.push(..._map)
     }
 
     setWheel()

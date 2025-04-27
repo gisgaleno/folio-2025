@@ -88,7 +88,7 @@ export class ResourcesLoader
                         progress()
                     },
                     undefined,
-                    resource => { error(_file, resource) },
+                    // resource => { error(_file, resource) },
                 )
             }
         }

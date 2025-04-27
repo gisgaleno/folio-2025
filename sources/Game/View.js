@@ -62,13 +62,21 @@ export class View
             this.resize()
         })
 
-        this.game.inputs.events.on('viewToggle', (event) =>
+        // Toggle
+        if(this.game.debug.active)
         {
-            if(event.down)
+            this.game.inputs.addMap([
+                { name: 'viewToggle', categories: [ 'debug' ], keys: [ 'KeyV' ] }
+            ])
+
+            this.game.inputs.events.on('viewToggle', (event) =>
             {
-                this.toggleMode()
-            }
-        })
+                if(event.down)
+                {
+                    this.toggleMode()
+                }
+            })
+        }
     }
 
     toggleMode()

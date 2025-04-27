@@ -20,6 +20,10 @@ export class Modals
         {
             this.onTransitionEnded()
         })
+
+        this.game.inputs.addMap([
+            { name: 'close', categories: [ 'ui', 'playing' ], keys: [ 'Escape' ] },
+        ])
     }
 
     onTransitionEnded()
@@ -166,16 +170,19 @@ export class Modals
             // Is preopened
             if(item.element.classList.contains('is-displayed'))
             {
-                // Debug > Close preopened modal
+                this.open(item.name)
+
+                // Debug > Wait two frames and close modal
                 if(this.game.debug.active)
                 {
-                    this.element.classList.remove('is-visible')
-                    item.element.classList.remove('is-displayed')
-                }
-                // Not debug > Cleanly opened modal
-                else
-                    this.open(item.name)
-                    
+                    requestAnimationFrame(() =>
+                    {
+                        requestAnimationFrame(() =>
+                        {
+                            this.close()
+                        })
+                    })
+                }                    
             }
         })
     }

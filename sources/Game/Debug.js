@@ -18,6 +18,10 @@ export class Debug
             this.panel.registerPlugin(EssentialsPlugin)
             this.panel.registerPlugin(CamerakitPlugin)
 
+            this.game.inputs.addMap([
+                { name: 'debugToggle', categories: [ 'debug' ], keys: [ 'KeyH' ] }
+            ])
+
             this.game.inputs.events.on('debugToggle', (event) =>
             {
                 if(event.down)

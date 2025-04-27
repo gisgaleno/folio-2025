@@ -123,34 +123,7 @@ export class Game
 
         this.server = new Server()
         this.ticker = new Ticker()
-        this.inputs = new Inputs([
-            // Vehicle
-            { name: 'forward',               categories: [ 'playing' ], keys: [ 'ArrowUp', 'KeyW' ] },
-            { name: 'right',                 categories: [ 'playing' ], keys: [ 'ArrowRight', 'KeyD' ] },
-            { name: 'backward',              categories: [ 'playing' ], keys: [ 'ArrowDown', 'KeyS' ] },
-            { name: 'left',                  categories: [ 'playing' ], keys: [ 'ArrowLeft', 'KeyA' ] },
-            { name: 'boost',                 categories: [ 'playing' ], keys: [ 'ShiftLeft', 'ShiftRight' ] },
-            { name: 'brake',                 categories: [ 'playing' ], keys: [ 'KeyB' ] },
-            { name: 'respawn',               categories: [ 'playing' ], keys: [ 'KeyR' ] },
-            { name: 'suspensions',           categories: [ 'playing' ], keys: [ 'Numpad5', 'Space' ] },
-            { name: 'suspensionsFront',      categories: [ 'playing' ], keys: [ 'Numpad8' ] },
-            { name: 'suspensionsBack',       categories: [ 'playing' ], keys: [ 'Numpad2' ] },
-            { name: 'suspensionsRight',      categories: [ 'playing' ], keys: [ 'Numpad6' ] },
-            { name: 'suspensionsLeft',       categories: [ 'playing' ], keys: [ 'Numpad4' ] },
-            { name: 'suspensionsFrontLeft',  categories: [ 'playing' ], keys: [ 'Numpad7' ] },
-            { name: 'suspensionsFrontRight', categories: [ 'playing' ], keys: [ 'Numpad9' ] },
-            { name: 'suspensionsBackRight',  categories: [ 'playing' ], keys: [ 'Numpad3' ] },
-            { name: 'suspensionsBackLeft',   categories: [ 'playing' ], keys: [ 'Numpad1' ] },
-            { name: 'whisper',               categories: [ 'playing' ], keys: [ 'KeyT' ] },
-            { name: 'interact',              categories: [ 'playing' ], keys: [ 'Enter' ] },
-
-            // UI
-            { name: 'close',                 categories: [ 'ui', 'playing' ], keys: [ 'Escape' ] },
-
-            // Debug
-            { name: 'viewToggle',            categories: [ 'debug' ], keys: [ 'KeyV' ] },
-            { name: 'debugToggle',           categories: [ 'debug' ], keys: [ 'KeyH' ] },
-        ])
+        this.inputs = new Inputs()
         this.debug = new Debug()
         this.time = new Time()
         this.viewport = new Viewport(this.domElement)

@@ -18,17 +18,12 @@ export class Whispers
         this.setData()
         this.setBubble()
         this.setModal()
+        this.setInputs()
 
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
         }, 3)
-
-        this.game.inputs.events.on('whisper', (event) =>
-        {
-            if(event.down)
-                this.game.modals.open('whispers')
-        })
     }
 
     setFlames()
@@ -366,6 +361,19 @@ export class Whispers
         {
             this.modal.offlineElement.style.display = 'block'
             updateGroup()
+        })
+    }
+
+    setInputs()
+    {
+        this.game.inputs.addMap([
+            { name: 'whisper', categories: [ 'playing' ], keys: [ 'KeyT' ] },
+        ])
+
+        this.game.inputs.events.on('whisper', (event) =>
+        {
+            if(event.down)
+                this.game.modals.open('whispers')
         })
     }
 

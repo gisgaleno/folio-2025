@@ -39,6 +39,26 @@ export class Player
 
     setInputs()
     {
+        this.game.inputs.addMap([
+            { name: 'forward',               categories: [ 'playing' ], keys: [ 'ArrowUp', 'KeyW' ] },
+            { name: 'right',                 categories: [ 'playing' ], keys: [ 'ArrowRight', 'KeyD' ] },
+            { name: 'backward',              categories: [ 'playing' ], keys: [ 'ArrowDown', 'KeyS' ] },
+            { name: 'left',                  categories: [ 'playing' ], keys: [ 'ArrowLeft', 'KeyA' ] },
+            { name: 'boost',                 categories: [ 'playing' ], keys: [ 'ShiftLeft', 'ShiftRight' ] },
+            { name: 'brake',                 categories: [ 'playing' ], keys: [ 'KeyB' ] },
+            { name: 'respawn',               categories: [ 'playing' ], keys: [ 'KeyR' ] },
+            { name: 'suspensions',           categories: [ 'playing' ], keys: [ 'Numpad5', 'Space' ] },
+            { name: 'suspensionsFront',      categories: [ 'playing' ], keys: [ 'Numpad8' ] },
+            { name: 'suspensionsBack',       categories: [ 'playing' ], keys: [ 'Numpad2' ] },
+            { name: 'suspensionsRight',      categories: [ 'playing' ], keys: [ 'Numpad6' ] },
+            { name: 'suspensionsLeft',       categories: [ 'playing' ], keys: [ 'Numpad4' ] },
+            { name: 'suspensionsFrontLeft',  categories: [ 'playing' ], keys: [ 'Numpad7' ] },
+            { name: 'suspensionsFrontRight', categories: [ 'playing' ], keys: [ 'Numpad9' ] },
+            { name: 'suspensionsBackRight',  categories: [ 'playing' ], keys: [ 'Numpad3' ] },
+            { name: 'suspensionsBackLeft',   categories: [ 'playing' ], keys: [ 'Numpad1' ] },
+            { name: 'interact',              categories: [ 'playing' ], keys: [ 'Enter' ] },
+        ])
+
         // Reset
         this.game.inputs.events.on('respawn', (_event) =>
         {

@@ -14,12 +14,12 @@ export class Server
             localStorage.setItem('uuid', this.uuid)
         }
 
-        this.connect = false
+        this.shouldConnect = true
         this.connected = false
         this.initData = null
         this.events = new Events()
 
-        if(this.connect)
+        if(this.shouldConnect)
         {
             // First connect attempt
             this.connect()
