@@ -85,7 +85,7 @@ export class Game
                     [ 'sceneryDynamicModel',            'scenery/sceneryDynamic.glb',                   'gltf'    ],
                     [ 'poleLightsVisualModel',          'poleLights/poleLightsVisual.glb',              'gltf'    ],
                     [ 'poleLightsPhysicalModel',        'poleLights/poleLightsPhysical.glb',            'gltf'    ],
-                    [ 'whisperBeamTexture',             'whispers/whisperBeam.png',                     'texture' ],
+                    [ 'whisperFlameTexture',            'whispers/whisperFlame.png',                    'texture' ],
                     [ 'satanStarTexture',               'scenery/satanStar.png',                        'texture' ],
                     [ 'tornadoPathModel',               'tornado/tornadoPath.glb',                      'gltf'    ],
                     [ 'overlayPatternTexture',          'overlay/overlayPattern.png',                   'texture', (resource) => { resource.wrapS = THREE.RepeatWrapping; resource.wrapT = THREE.RepeatWrapping } ],

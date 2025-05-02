@@ -58,34 +58,12 @@ export class Whispers
 
         beamMaterial.outputNode = Fn(() =>
         {
-            const mask = texture(this.game.resources.whisperBeamTexture, uv()).r.sub(revealAttribute.oneMinus())
+            const mask = texture(this.game.resources.whisperFlameTexture, uv()).r.sub(revealAttribute.oneMinus())
             const color = texture(this.game.materials.gradientTexture, vec2(0, mask))
             const alpha = smoothstep(0.05, 0.3, mask)
-            const emissiveMultiplier = smoothstep(0.8, 1, mask).add(1).mul(2)
 
-            return vec4(vec3(color.mul(emissiveMultiplier)), alpha.mul(revealAttribute))
+            return vec4(vec3(color.mul(2)), alpha.mul(revealAttribute))
         })()
-
-        // // Sphere
-        // const sphereGeometry = new THREE.SphereGeometry(0.5, 20, 8)
-        
-        // const sphereMaterial = new THREE.MeshBasicNodeMaterial()
-        // sphereMaterial.outputNode = Fn(() =>
-        // {
-        //     const viewDirection = positionWorld.sub(cameraPosition).normalize()
-                
-        //     const fresnel = viewDirection.dot(normalWorld).abs().oneMinus().toVar()
-        //     const remapedFresnel = fresnel.oneMinus().pow(2).oneMinus().toVar()
-        //     const color = texture(this.game.materials.gradientTexture, vec2(0, remapedFresnel))
-        //     // color.mulAssign(2)
-        //     return vec4(vec3(color), 1)
-        // })()
-
-        // const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial)
-        // sphere.rotation.reorder('YXZ')
-        // sphere.rotation.y = Math.PI * 0.25
-        // sphere.rotation.x = Math.PI * 0.25
-        // group.add(sphere)
 
         // Instanced mesh
         this.flames = new THREE.InstancedMesh(beamGeometry, beamMaterial, this.count)
