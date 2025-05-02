@@ -3,10 +3,15 @@ import { Game } from './Game.js'
 
 export class Modals
 {
+    static OPENED = 1
+    static OPENING = 2
+    static CLOSING = 3
+    static CLOSED = 4
+    
     constructor()
     {
         this.game = Game.getInstance()
-        this.visible = false
+        this.state = Modals.CLOSED
         this.element = document.querySelector('.js-modals')
         this.current = null
         this.pending = null
@@ -29,11 +34,16 @@ export class Modals
 
     onTransitionEnded()
     {
-        if(!this.visible)
+        if(this.state === Modals.OPENING)
         {
+            this.state = Modals.OPENED
+            this.current.events.trigger('opened')
+        }
+        else if(this.state === Modals.CLOSING)
+        {
+            this.state = Modals.CLOSED
             this.current.events.trigger('closed')
             this.current.element.classList.remove('is-displayed')
-            this.current = null
             
             // Pending => Open pending
             if(this.pending)
@@ -47,10 +57,6 @@ export class Modals
             {
                 this.element.classList.remove('is-displayed')
             }
-        }
-        else
-        {
-            this.current.events.trigger('opened')
         }
     }
 
@@ -98,12 +104,12 @@ export class Modals
 
             if(event.down)
             {
-                if(this.visible)
+                if(this.state === Modals.OPENED || this.state === Modals.OPENING)
                 {
                     this.pending = null
                     this.close()
                 }
-                else
+                else if(this.state === Modals.CLOSED || this.state === Modals.CLOSING)
                 {
                     if(this.default)
                         this.open(this.default.name)
@@ -119,11 +125,22 @@ export class Modals
         if(!item)
             return
 
-        if(item === this.current)
-            return
+        // Already visible => Set pending
+        if(this.state === Modals.OPENED || this.state === Modals.OPENING)
+        {
+            if(item === this.current)
+                return
 
+            this.pending = name
+            this.close()
+        }
+        // Already closing => Set (or change) pending
+        else if(this.state === Modals.CLOSING)
+        {
+            this.pending = name
+        }
         // Currently closed => Open immediately
-        if(!this.visible)
+        else if(this.state === Modals.CLOSED)
         {
             this.element.classList.add('is-displayed')
             item.element.classList.add('is-displayed')
@@ -140,29 +157,23 @@ export class Modals
                 })
             })
 
-            this.visible = true
+            this.state = Modals.OPENING
             this.current = item
             this.game.inputs.updateFilters(['ui'])
 
             item.events.trigger('open')
         }
 
-        // Already visible => Set pending
-        else
-        {
-            this.pending = name
-            this.close()
-        }
     }
 
     close()
     {
-        if(!this.visible)
+        if(this.state === Modals.CLOSING || this.state === Modals.CLOSED)
             return
 
         this.element.classList.remove('is-visible')
 
-        this.visible = false
+        this.state = Modals.CLOSING
         this.game.inputs.updateFilters([])
         this.current.events.trigger('close')
     }

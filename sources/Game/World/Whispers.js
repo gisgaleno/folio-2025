@@ -624,9 +624,6 @@ export class Whispers
                 {
                     const country = this.countries.get(closestWhisper.countryCode)
 
-                    console.log(country)
-                    console.log(country.imageUrl)
-
                     if(country)
                         imageUrl = country.imageUrl
                 }
