@@ -152,6 +152,10 @@ export class Lighting
                 // Fog
                 const foggedColor = this.game.fog.strength.mix(shadedColor, this.game.fog.color)
 
+                // Alpha discard
+                alpha.lessThan(0.1).discard()
+
+                // Output
                 return vec4(foggedColor.rgb, alpha)
             })([inputColor, alpha, totalShadows])
         }

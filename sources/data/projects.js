@@ -1,7 +1,7 @@
 export default [
     {
-        name: 'Chartogne Taillet',
-        nameSmall: [ 'Chartogne', 'Taillet' ],
+        title: 'Chartogne Taillet',
+        titleSmall: [ 'Chartogne', 'Taillet' ],
         url: 'https://chartogne-taillet.com',
         attributes:
         {
@@ -18,8 +18,8 @@ export default [
         ]
     },
     {
-        name: 'Bonhomme | 10 ans',
-        nameSmall: [ 'Bonhomme', '10 ans' ],
+        title: 'Bonhomme | 10 ans',
+        titleSmall: [ 'Bonhomme', '10 ans' ],
         url: 'https://anniversary.bonhommeparis.com',
         attributes:
         {
@@ -35,8 +35,8 @@ export default [
         ]
     },
     {
-        name: 'Madbox',
-        nameSmall: [ 'Madbox' ],
+        title: 'Madbox',
+        titleSmall: [ 'Madbox' ],
         url: 'https://madbox.io',
         attributes:
         {
