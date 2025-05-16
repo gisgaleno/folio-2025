@@ -36,7 +36,7 @@ export class Projects
         this.setInteractiveArea()
         this.setInputs()
         this.setCinematic()
-        this.setMix()
+        this.setShadeMix()
         this.setTexts()
         this.setImages()
         this.setPagination()
@@ -122,12 +122,19 @@ export class Projects
         }
     }
 
-    setMix()
+    setShadeMix()
     {
-        this.mix = {}
-        this.mix.min = 0
-        this.mix.max = 0.3
-        this.mix.uniform = uniform(this.mix.min)
+        this.shadeMix = {}
+
+        this.shadeMix.images = {}
+        this.shadeMix.images.min = 0
+        this.shadeMix.images.max = 0.6
+        this.shadeMix.images.uniform = uniform(this.shadeMix.images.min)
+
+        this.shadeMix.texts = {}
+        this.shadeMix.texts.min = 0
+        this.shadeMix.texts.max = 0.3
+        this.shadeMix.texts.uniform = uniform(this.shadeMix.texts.min)
     }
 
     setTexts()
@@ -152,7 +159,7 @@ export class Projects
                 mix(
                     shadedOutput,
                     this.texts.baseColor,
-                    this.mix.uniform
+                    this.shadeMix.texts.uniform
                 ),
             alpha)
 
@@ -200,7 +207,7 @@ export class Projects
         //         mix(
         //             shadedOutput,
         //             baseColor,
-        //             this.mix.uniform
+        //             this.shadeMix.uniform
         //         ),
         //     alpha)
         //     // material.outputNode = vec4(color('#ffffff'), texture(text.textWrapper.texture).r)
@@ -235,7 +242,7 @@ export class Projects
         {
             const textureColor = texture(this.images.texture).rgb
             const shadedOutput = this.game.lighting.lightOutputNodeBuilder(textureColor, float(1), normalWorld, totalShadows)
-            return vec4(mix(shadedOutput.rgb, textureColor, this.mix.uniform), 1)
+            return vec4(mix(shadedOutput.rgb, textureColor, this.shadeMix.images.uniform), 1)
         })()
 
         this.images.mesh.material = this.images.material
@@ -594,8 +601,9 @@ export class Projects
         // Interactive area
         this.interactiveArea.hide()
 
-        // Images mix
-        gsap.to(this.mix.uniform, { value: this.mix.max, duration: 2, ease: 'power2.inOut', overwrite: true })
+        // Shade mix
+        gsap.to(this.shadeMix.images.uniform, { value: this.shadeMix.images.max, duration: 2, ease: 'power2.inOut', overwrite: true })
+        gsap.to(this.shadeMix.texts.uniform, { value: this.shadeMix.texts.max, duration: 2, ease: 'power2.inOut', overwrite: true })
     }
 
     close()
@@ -611,8 +619,9 @@ export class Projects
         // View cinematic
         this.game.view.cinematic.end()
 
-        // Images mix
-        gsap.to(this.mix.uniform, { value: this.mix.min, duration: 2, ease: 'power2.inOut', overwrite: true })
+        // Shade mix
+        gsap.to(this.shadeMix.images.uniform, { value: this.shadeMix.images.min, duration: 1.5, ease: 'power2.inOut', overwrite: true })
+        gsap.to(this.shadeMix.texts.uniform, { value: this.shadeMix.texts.min, duration: 1.5, ease: 'power2.inOut', overwrite: true })
 
         // Interactive area
         gsap.delayedCall(1, () =>
@@ -658,20 +667,6 @@ export class Projects
         this.currentProject = projects[this.index]
         this.previousProject = projects[(this.index - 1) < 0 ? projects.length - 1 : this.index - 1]
         this.nextProject = projects[(this.index + 1) % projects.length]
-
-        // // Title
-        // this.texts.title.textWrapper.updateText(this.currentProject.title)
-
-        // // URL
-        // this.texts.url.textWrapper.updateText(this.currentProject.url)
-        // const ratio = this.texts.url.textWrapper.getMeasure().width / this.density
-        // this.parameters.urlPanel.scale.x = ratio + 0.2
-
-        // // Previous
-        // this.texts.previous.textWrapper.updateText(this.previousProject.titleSmall)
-
-        // // Next
-        // this.texts.next.textWrapper.updateText(this.nextProject.titleSmall)
 
         // Update components
         this.attributes.update()
