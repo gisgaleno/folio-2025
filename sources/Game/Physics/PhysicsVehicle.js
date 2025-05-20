@@ -417,4 +417,16 @@ export class PhysicsVehicle
         this.stop.test()
         this.upsideDown.test()
     }
+
+    activate()
+    {
+        this.chassis.physical.body.setLinvel({ x: 0, y: 0, z: 0 })
+        this.chassis.physical.body.setAngvel({ x: 0, y: 0, z: 0 })
+        this.chassis.physical.body.setEnabled(true)
+    }
+
+    deactivate()
+    {
+        this.chassis.physical.body.setEnabled(false)
+    }
 }

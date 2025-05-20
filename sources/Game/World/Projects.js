@@ -914,6 +914,9 @@ export class Projects
             
         this.adjacents.next.intersect.active = true
         this.adjacents.previous.intersect.active = true
+
+        // Deactivate physical vehicle
+        this.game.physicalVehicle.deactivate()
     }
 
     close()
@@ -955,6 +958,9 @@ export class Projects
 
         this.adjacents.next.intersect.active = false
         this.adjacents.previous.intersect.active = false
+
+        // Activate physical vehicle
+        this.game.physicalVehicle.activate()
     }
 
     previous()
