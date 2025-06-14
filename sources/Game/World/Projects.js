@@ -4,7 +4,7 @@ import { InteractiveAreas } from '../InteractiveAreas.js'
 import gsap from 'gsap'
 import projects from '../../data/projects.js'
 import { TextCanvas } from '../TextCanvas.js'
-import { add, color, float, Fn, If, mix, mul, normalWorld, positionGeometry, sin, step, texture, uniform, uv, vec4 } from 'three/tsl'
+import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, sin, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl'
 
 export class Projects
 {
@@ -45,10 +45,11 @@ export class Projects
         this.setTitle()
         this.setUrl()
         this.setDistinctions()
-        this.setPendulum()
         this.setBoard()
-        this.setFlame()
         this.setLabels()
+        this.setOven()
+        this.setGrinder()
+        this.setAnvil()
 
         this.changeProject(0)
 
@@ -58,6 +59,11 @@ export class Projects
             this.debugPanel.addButton({ title: 'open', label: 'open' }).on('click', () => { this.open() })
             this.debugPanel.addButton({ title: 'close', label: 'close' }).on('click', () => { this.close() })
         }
+
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        })
     }
 
     setInteractiveArea()
@@ -1095,6 +1101,83 @@ export class Projects
         }
     }
 
+    setOven()
+    {
+        this.oven = {}
+
+        // Blower
+        this.oven.blower = this.references.get('blower')[0]
+
+        // Charcoal
+        this.oven.charcoal = this.references.get('charcoal')[0]
+
+        const material = new THREE.MeshLambertNodeMaterial()
+        const totalShadows = this.game.lighting.addTotalShadowToMaterial(material)
+        this.oven.threshold = uniform(0.2)
+
+        material.outputNode = Fn(() =>
+        {
+            const baseUv = uv().toVar()
+
+            const baseColor = color('#6F6A87')
+            const lightOutput = this.game.lighting.lightOutputNodeBuilder(baseColor, float(1), vec3(0, 1, 0), totalShadows, true, false)
+
+            const distanceToCenter = baseUv.sub(0.5).length()
+
+            const voronoi = texture(
+                this.game.noises.voronoi,
+                baseUv
+            ).g
+
+            voronoi.lessThan(this.oven.threshold).discard()
+
+            return lightOutput
+        })()
+
+        this.oven.charcoal.material = material
+    }
+
+    setGrinder()
+    {
+        this.grinder = this.references.get('grinder')[0]
+    }
+
+    setAnvil()
+    {
+        this.anvil = {}
+        
+        // Hammer
+        this.anvil.hammer = this.references.get('hammer')[0]
+
+        // Blade
+        this.anvil.blade = this.references.get('blade')[0]
+
+        const material = new THREE.MeshLambertNodeMaterial()
+        const totalShadows = this.game.lighting.addTotalShadowToMaterial(material)
+
+        const colorA = uniform(color('#ff8641'))
+        const colorB = uniform(color('#ff3e00'))
+        const intensity = uniform(1.7)
+
+        material.outputNode = Fn(() =>
+        {
+            const baseUv = uv().toVar()
+
+            const baseColor = color('#a88c7f')
+            const lightOutput = this.game.lighting.lightOutputNodeBuilder(baseColor, float(1), vec3(0, 1, 0), totalShadows, true, false)
+
+            const emissiveColor = mix(colorA, colorB, uv().sub(0.5).length().mul(2)).toVar()
+            const emissiveOutput = emissiveColor.div(luminance(emissiveColor)).mul(intensity)
+
+            const mixStrength = baseUv.y.smoothstep(0.4, 0.9)
+            const output = mix(lightOutput, emissiveOutput, mixStrength)
+
+            return vec4(output.rgb, 1)
+        })()
+
+        this.anvil.blade.material = material
+    }
+
     open()
     {
         if(this.state === Projects.STATE_OPEN || this.state === Projects.STATE_OPENING)
@@ -1292,5 +1375,19 @@ export class Projects
         // Update components
         this.images.update(direction)
         this.pagination.update()
+    }
+
+    update()
+    {
+        // Oven
+        this.oven.blower.scale.y = (Math.sin(this.game.ticker.elapsedScaled) * 0.2 + 0.8)
+        this.oven.threshold.value = (- Math.sin(this.game.ticker.elapsedScaled - 0.5) * 0.1 + 0.25)
+
+        // Grinder
+        this.grinder.rotation.z = - this.game.ticker.elapsedScaled * 0.75
+
+        // Anvil
+        this.anvil.hammer.rotation.reorder('YXZ')
+        this.anvil.hammer.rotation.z = Math.pow(1 - Math.abs(Math.sin(this.game.ticker.elapsedScaled * 1)), 5) - 1
     }
 }

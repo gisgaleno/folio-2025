@@ -450,7 +450,6 @@ export class CookieStand
         const timeScale = (Math.sin(this.game.ticker.elapsedScaled) * 0.3 + 0.5) * 0.3
         this.localTime.value += this.game.ticker.deltaScaled * timeScale
 
-        // console.log()
         this.blower.scale.y = Math.sin(this.game.ticker.elapsedScaled + Math.PI) * 0.25 + 0.75
     }
 }
