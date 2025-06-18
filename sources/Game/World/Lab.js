@@ -49,9 +49,9 @@ export class Lab
         this.setBlackBoard()
         this.setCandleFlames()
         this.setCauldron()
-        // this.setLabels()
 
         this.changeProject(0)
+        this.scroller.progress = this.scroller.targetProgress
 
         // Debug
         if(this.game.debug.active)
@@ -721,6 +721,8 @@ export class Lab
             this.scroller.minis.items = []
             this.scroller.minis.total = this.data.length * this.scroller.minis.inter
             this.scroller.minis.current = null
+            this.scroller.minis.width = 1920 / 8
+            this.scroller.minis.height = 1080 / 8
 
             let i = 0
             for(const project of this.data)
@@ -762,14 +764,13 @@ export class Lab
                     const totalShadows = this.game.lighting.addTotalShadowToMaterial(this.images.material)
 
                     const imageElement = new Image()
-                    imageElement.width = 240
-                    imageElement.height = 135
+                    imageElement.width = this.scroller.minis.width
+                    imageElement.height = this.scroller.minis.height
                     imageElement.onload = () =>
                     {
                         gsap.to(loadProgress, { value: 1, duration: 0.3, overwrite: true })
                         imageTexture.needsUpdate = true
                     }
-                    imageElement.src = `lab/images/${project.imageMini}`
 
                     const imageTexture = new THREE.Texture(imageElement)
                     imageTexture.colorSpace = THREE.SRGBColorSpace
@@ -790,6 +791,20 @@ export class Lab
                     imageMesh.receiveShadow = true
                     imageMesh.castShadow = false
                     imageMesh.material = material
+
+                    // Load
+                    mini.startedLoading = false
+                    mini.startLoading = () =>
+                    {
+                        if(mini.startedLoading)
+                            return
+
+                        console.log('load')
+
+                        imageElement.src = `lab/images/${project.imageMini}`
+
+                        mini.startedLoading = true
+                    }
                 }
 
                 // Text
@@ -886,6 +901,11 @@ export class Lab
 
                 mini.group.visible = scale > 0
                 mini.intersect.active = mini.group.visible && (this.state === Lab.STATE_OPEN || this.state === Lab.STATE_OPENING)
+
+                if(mini.group.visible && !mini.startedLoading)
+                {
+                    mini.startLoading()
+                }
             }
         }
 
@@ -1089,19 +1109,15 @@ export class Lab
 
             if(this.game.debug.active)
             {
-                this.game.debug.addThreeColorBinding(this.debugPanel, colorA.value, 'colorA')
-                this.game.debug.addThreeColorBinding(this.debugPanel, colorB.value, 'colorB')
+                const debugPanel = this.debugPanel.addFolder({
+                    title: 'cauldron',
+                    expanded: false,
+                })
+                this.game.debug.addThreeColorBinding(debugPanel, colorA.value, 'colorA')
+                this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
             }
         }
 
-    }
-
-    setLabels()
-    {
-        for(const mesh of this.references.get('label'))
-        {
-            mesh.castShadow = false
-        }
     }
 
     open()

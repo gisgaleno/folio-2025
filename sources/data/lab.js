@@ -14,8 +14,8 @@ export default [
     {
         title: 'Particles System',
         url: 'https://three-js-tsl-particles-system.vercel.app',
-        image: 'particles-system.png',
-        imageMini: 'particles-system-mini.png'
+        image: 'particles-system.webp',
+        imageMini: 'particles-system-mini.webp'
     },
     {
         title: 'Holographic terrain',
@@ -26,20 +26,20 @@ export default [
     {
         title: 'Woodkid Volcano Robot',
         url: 'https://experiment-woodkid-volcano-robot.vercel.app',
-        image: 'woodkid-volcano-robot.png',
-        imageMini: 'woodkid-volcano-robot-mini.png'
+        image: 'woodkid-volcano-robot.webp',
+        imageMini: 'woodkid-volcano-robot-mini.webp'
     },
     {
         title: 'VFX flames',
         url: 'https://threejs.org/examples/webgpu_tsl_vfx_flames.html',
-        image: 'vfx-flames.png',
-        imageMini: 'vfx-flames-mini.png'
+        image: 'vfx-flames.webp',
+        imageMini: 'vfx-flames-mini.webp'
     },
     {
         title: 'VFX tornado',
         url: 'https://threejs.org/examples/webgpu_tsl_vfx_tornado.html',
-        image: 'vfx-tornado.png',
-        imageMini: 'vfx-tornado-mini.png'
+        image: 'vfx-tornado.webp',
+        imageMini: 'vfx-tornado-mini.webp'
     },
     {
         title: 'DOOM Portal',
