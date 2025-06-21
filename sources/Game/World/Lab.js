@@ -115,12 +115,14 @@ export class Lab
         this.cinematic.positionOffset = new THREE.Vector3(4.65, 4.20, 4.85)
         
         this.cinematic.target = new THREE.Vector3()
-        this.cinematic.targetOffset = new THREE.Vector3(-2.60, 1.22, -4.80)
+        this.cinematic.targetOffset = new THREE.Vector3(-2.60, 1.32, -4.80)
 
         const applyPositionAndTarget = () =>
         {
-            this.cinematic.position.copy(this.references.get('interactiveArea')[0].position).add(this.cinematic.positionOffset)
-            this.cinematic.target.copy(this.references.get('interactiveArea')[0].position).add(this.cinematic.targetOffset)
+            const flatPosition = this.references.get('interactiveArea')[0].position.clone()
+            flatPosition.y = 0
+            this.cinematic.position.copy(flatPosition).add(this.cinematic.positionOffset)
+            this.cinematic.target.copy(flatPosition).add(this.cinematic.targetOffset)
         }
         applyPositionAndTarget()
 

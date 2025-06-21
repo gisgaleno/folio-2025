@@ -120,8 +120,10 @@ export class Projects
 
         const applyPositionAndTarget = () =>
         {
-            this.cinematic.position.copy(this.references.get('interactiveArea')[0].position).add(this.cinematic.positionOffset)
-            this.cinematic.target.copy(this.references.get('interactiveArea')[0].position).add(this.cinematic.targetOffset)
+            const flatPosition = this.references.get('interactiveArea')[0].position.clone()
+            flatPosition.y = 0
+            this.cinematic.position.copy(flatPosition).add(this.cinematic.positionOffset)
+            this.cinematic.target.copy(flatPosition).add(this.cinematic.targetOffset)
         }
         applyPositionAndTarget()
 
