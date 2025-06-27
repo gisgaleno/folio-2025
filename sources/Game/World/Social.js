@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { InteractiveAreas } from '../InteractiveAreas.js'
+import socialData from '../../data/social.js'
 
 export class Social
 {
@@ -25,23 +26,12 @@ export class Social
 
     setLinks()
     {
-        const links = [
-            { name: 'X', url: 'https://x.com/bruno_simon', align: InteractiveAreas.ALIGN_RIGHT },
-            { name: 'Bluesky', url: 'https://bsky.app/profile/bruno-simon.bsky.social', align: InteractiveAreas.ALIGN_RIGHT },
-            { name: 'Youtube', url: 'https://www.youtube.com/@BrunoSimon', align: InteractiveAreas.ALIGN_RIGHT },
-            { name: 'Mail', url: 'mailto:simon.bruno.77@gmail.com', align: InteractiveAreas.ALIGN_RIGHT },
-            { name: 'Twitch', url: 'https://www.twitch.tv/bruno_simon_dev', align: InteractiveAreas.ALIGN_RIGHT },
-            { name: 'GitHub', url: 'https://github.com/brunosimon', align: InteractiveAreas.ALIGN_RIGHT },
-            { name: 'LinkedIn', url: 'https://www.linkedin.com/in/simonbruno77/', align: InteractiveAreas.ALIGN_LEFT },
-            { name: 'Discord', url: 'https://discord.com/users/202907325722263553', align: InteractiveAreas.ALIGN_LEFT },
-        ]
-
         const radius = 6
         let i = 0
 
-        for(const link of links)
+        for(const link of socialData)
         {
-            const angle = i * Math.PI / (links.length - 1)
+            const angle = i * Math.PI / (socialData.length - 1)
             const position = this.center.clone()
             position.x += Math.cos(angle) * radius
             position.y = 1
@@ -50,7 +40,7 @@ export class Social
             this.interactiveArea = this.game.interactiveAreas.create(
                 position,
                 link.name,
-                link.align,
+                link.align === 'left' ? InteractiveAreas.ALIGN_LEFT : InteractiveAreas.ALIGN_RIGHT,
                 () =>
                 {
                     window.open(link.url, '_blank')

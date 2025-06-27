@@ -5,7 +5,7 @@ import { hash } from 'three/tsl'
 import gsap from 'gsap'
 import { Bubble } from './Bubble.js'
 import emojiRegex from 'emoji-regex'
-import countries from '../../data/countries.js'
+import countriesData from '../../data/countries.js'
 
 export class Whispers
 {
@@ -401,7 +401,7 @@ export class Whispers
         })
 
         // Countries
-        for(const _country of countries)
+        for(const _country of countriesData)
         {
             const imageUrl = `ui/flags/${_country[2]}.png`
             const element = document.createElement('div')

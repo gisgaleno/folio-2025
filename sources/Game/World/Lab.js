@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { InteractiveAreas } from '../InteractiveAreas.js'
 import gsap from 'gsap'
-import lab from '../../data/lab.js'
+import labData from '../../data/lab.js'
 import { TextCanvas } from '../TextCanvas.js'
 import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, positionWorld, sin, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { remapClamp, safeMod, signedModDelta } from '../utilities/maths.js'
@@ -31,7 +31,6 @@ export class Lab
         
         this.references = references
         this.state = Lab.STATE_CLOSED
-        this.data = lab
 
         this.setInteractiveArea()
         this.setInputs()
@@ -354,12 +353,12 @@ export class Lab
                 projectIndex += 1
 
             if(projectIndex < 0)
-                projectIndex = this.data.length - 1
+                projectIndex = labData.length - 1
 
-            if(projectIndex > this.data.length - 1)
+            if(projectIndex > labData.length - 1)
                 projectIndex = 0
 
-            const key = this.data[projectIndex].image
+            const key = labData[projectIndex].image
             const resource = this.images.getResourceAndLoad(key)
         }
 
@@ -721,13 +720,13 @@ export class Lab
             this.scroller.minis = {}
             this.scroller.minis.inter = 0.9
             this.scroller.minis.items = []
-            this.scroller.minis.total = this.data.length * this.scroller.minis.inter
+            this.scroller.minis.total = labData.length * this.scroller.minis.inter
             this.scroller.minis.current = null
             this.scroller.minis.width = 1920 / 8
             this.scroller.minis.height = 1080 / 8
 
             let i = 0
-            for(const project of this.data)
+            for(const project of labData)
             {
                 const mini = {}
                 mini.index = i
@@ -912,8 +911,8 @@ export class Lab
         this.scroller.update = () =>
         {
             // Scroll
-            const centeringOffset = this.data.length - 3.25
-            const closestProgress = Math.round((this.scroller.progress + this.navigation.index - centeringOffset) / this.data.length) * this.data.length - this.navigation.index + centeringOffset
+            const centeringOffset = labData.length - 3.25
+            const closestProgress = Math.round((this.scroller.progress + this.navigation.index - centeringOffset) / labData.length) * labData.length - this.navigation.index + centeringOffset
             this.scroller.targetProgress = closestProgress
 
             // Active text
@@ -1235,10 +1234,10 @@ export class Lab
         // Loop index
         let loopIndex = index
 
-        if(loopIndex > this.data.length - 1)
+        if(loopIndex > labData.length - 1)
             loopIndex = 0
         else if(loopIndex < 0)
-            loopIndex = this.data.length - 1
+            loopIndex = labData.length - 1
 
         // Already active
         if(this.navigation.index === loopIndex)
@@ -1246,13 +1245,13 @@ export class Lab
 
         // Direction
         if(direction === null)
-            direction = signedModDelta(loopIndex, this.navigation.index, this.data.length) > 0 ? Lab.DIRECTION_PREVIOUS : Lab.DIRECTION_NEXT
+            direction = signedModDelta(loopIndex, this.navigation.index, labData.length) > 0 ? Lab.DIRECTION_PREVIOUS : Lab.DIRECTION_NEXT
 
         // Save
         this.navigation.index = loopIndex
-        this.navigation.current = this.data[this.navigation.index]
-        this.navigation.previous = this.data[(this.navigation.index - 1) < 0 ? this.data.length - 1 : this.navigation.index - 1]
-        this.navigation.next = this.data[(this.navigation.index + 1) % this.data.length]
+        this.navigation.current = labData[this.navigation.index]
+        this.navigation.previous = labData[(this.navigation.index - 1) < 0 ? labData.length - 1 : this.navigation.index - 1]
+        this.navigation.next = labData[(this.navigation.index + 1) % labData.length]
         this.navigation.direction = direction
 
         // Update components

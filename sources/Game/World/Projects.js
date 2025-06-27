@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { InteractiveAreas } from '../InteractiveAreas.js'
 import gsap from 'gsap'
-import projects from '../../data/projects.js'
+import projectsData from '../../data/projects.js'
 import { TextCanvas } from '../TextCanvas.js'
 import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, sin, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl'
 
@@ -30,7 +30,6 @@ export class Projects
         
         this.references = references
         this.state = Projects.STATE_CLOSED
-        this.data = projects
 
         this.setInteractiveArea()
         this.setInputs()
@@ -362,21 +361,21 @@ export class Projects
                 projectIndex -= 1
 
                 if(projectIndex < 0)
-                    projectIndex = this.data.length - 1
+                    projectIndex = projectsData.length - 1
 
-                imageIndex = this.data[projectIndex].images.length - 1
+                imageIndex = projectsData[projectIndex].images.length - 1
             }
             else if(imageIndex > this.navigation.current.images.length - 1)
             {
                 projectIndex += 1
 
-                if(projectIndex > this.data.length - 1)
+                if(projectIndex > projectsData.length - 1)
                     projectIndex = 0
 
                 imageIndex = 0
             }
 
-            const key = this.data[projectIndex].images[imageIndex]
+            const key = projectsData[projectIndex].images[imageIndex]
             const resource = this.images.getResourceAndLoad(key)
         }
 
@@ -1340,16 +1339,16 @@ export class Projects
         // Loop index
         let loopIndex = index
 
-        if(loopIndex > this.data.length - 1)
+        if(loopIndex > projectsData.length - 1)
             loopIndex = 0
         else if(loopIndex < 0)
-            loopIndex = this.data.length - 1
+            loopIndex = projectsData.length - 1
 
         // Save
         this.navigation.index = loopIndex
-        this.navigation.current = this.data[this.navigation.index]
-        this.navigation.previous = this.data[(this.navigation.index - 1) < 0 ? this.data.length - 1 : this.navigation.index - 1]
-        this.navigation.next = this.data[(this.navigation.index + 1) % this.data.length]
+        this.navigation.current = projectsData[this.navigation.index]
+        this.navigation.previous = projectsData[(this.navigation.index - 1) < 0 ? projectsData.length - 1 : this.navigation.index - 1]
+        this.navigation.next = projectsData[(this.navigation.index + 1) % projectsData.length]
 
         // Update components
         this.attributes.update()
