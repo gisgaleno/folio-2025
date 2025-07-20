@@ -5,7 +5,7 @@ export class Nipple
         this.container = container
         this.eventsTarget = eventsTarget
 
-        this.edgeRadius = 80
+        this.edgeRadius = 90
         this.thumbRadius = 30
         this.maxRadius = this.edgeRadius
 

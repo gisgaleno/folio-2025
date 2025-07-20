@@ -266,7 +266,7 @@ export class VisualVehicle
             this.parts.stopLights.visible = false
 
         // Boost trails
-        const trailAlpha = physicalVehicle.goingForward && this.game.player.boosting && (this.game.inputs.actions.get('forward').active) ? 1 : 0
+        const trailAlpha = physicalVehicle.goingForward && this.game.player.boosting && this.game.player.accelerating > 0 ? 1 : 0
         this.boostTrails.leftReference.getWorldPosition(this.boostTrails.left.position)
         this.boostTrails.left.alpha = trailAlpha
         this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
