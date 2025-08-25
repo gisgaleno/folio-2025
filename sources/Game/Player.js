@@ -229,19 +229,19 @@ export class Player
         /**
          * Touch Joystick
          */
-        if(this.game.touchJoystick.active && this.game.touchJoystick.progress > 0)
+        if(this.game.nipple.active && this.game.nipple.progress > 0)
         {
             this.game.view.focusPoint.isTracking = true
-            this.accelerating = Math.pow(this.game.touchJoystick.progress, 3)
-            this.boosting = this.game.touchJoystick.progress > 0.999
+            this.accelerating = Math.pow(this.game.nipple.progress, 3)
+            this.boosting = this.game.nipple.progress > 0.999
 
-            let angleDeltaAbs = Math.abs(this.game.touchJoystick.smallestRotation)
-            const angleDeltaSign = Math.sign(this.game.touchJoystick.smallestRotation)
+            let angleDeltaAbs = Math.abs(this.game.nipple.smallestRotation)
+            const angleDeltaSign = Math.sign(this.game.nipple.smallestRotation)
             const steering = - Math.min(angleDeltaAbs, 1) * angleDeltaSign
 
             this.steering = steering
 
-            if(!this.game.touchJoystick.forward)
+            if(!this.game.nipple.forward)
             {
                 this.accelerating *= -1
                 this.steering *= -1
@@ -316,6 +316,6 @@ export class Player
 
         // Inputs touch joystick
         this.rotationY = Math.atan2(this.game.physicalVehicle.forward.z, this.game.physicalVehicle.forward.x)
-        this.game.touchJoystick.setCoordinates(this.position.x, this.position.y, this.position.z, this.rotationY)
+        this.game.nipple.setCoordinates(this.position.x, this.position.y, this.position.z, this.rotationY)
     }
 }

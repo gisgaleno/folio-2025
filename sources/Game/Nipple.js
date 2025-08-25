@@ -4,7 +4,7 @@ import { Game } from './Game.js'
 import { clamp } from 'three/src/math/MathUtils.js'
 import { smallestAngle } from './utilities/maths.js'
 
-export class TouchJoystick
+export class Nipple
 {
     constructor()
     {
@@ -105,7 +105,7 @@ export class TouchJoystick
             })
             progressFill.assign(progressFill.mul(inAngle))
 
-            const progressOutline = progressSDF.step(this.outlineThickness / 4)
+            const progressOutline = progressSDF.step(this.outlineThickness / 4).mul(directionAngle)
 
             // Final fill and outline
             const outline = max(edgesOutline, progressOutline)
