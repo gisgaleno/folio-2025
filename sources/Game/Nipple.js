@@ -19,10 +19,10 @@ export class Nipple
 
         this.active = false
         this.animated = false
-        this.rotation = 0
+        this.angle = 0
         this.progress = 0
-        this.smallestRotation = 0
-        this.targetRotation = 0
+        this.smallestAngle = 0
+        this.targetAngle = 0
         this.forward = true
 
         this.setMeshes()
@@ -128,7 +128,7 @@ export class Nipple
         this.group.position.copy(this.position)
         this.uniforms.position.value.copy(this.position)
 
-        this.rotation = angle
+        this.angle = angle
         this.mesh.rotation.y = - angle
     }
 
@@ -179,8 +179,8 @@ export class Nipple
                     // Distance
                     const distance = this.position.distanceTo(intersect)
 
-                    // Target rotation
-                    this.targetRotation = Math.atan2(intersect.z - this.position.z, intersect.x - this.position.x)
+                    // Target angle
+                    this.targetAngle = Math.atan2(intersect.z - this.position.z, intersect.x - this.position.x)
 
                     // Progress
                     this.progress = clamp((distance - this.progressRadiusLow) / (this.progressRadiusHigh - this.progressRadiusLow), 0, 1)
@@ -238,32 +238,32 @@ export class Nipple
         if(this.active || this.animated)
         {
             // Smallest angle and forward
-            this.smallestRotation = smallestAngle(this.rotation, this.targetRotation)
-            let smallestRotationAbs = Math.abs(this.smallestRotation)
+            this.smallestAngle = smallestAngle(this.angle, this.targetAngle)
+            let smallestAngleAbs = Math.abs(this.smallestAngle)
 
-            this.forward = smallestRotationAbs < this.forwardAmplitude / 2
+            this.forward = smallestAngleAbs < this.forwardAmplitude / 2
                 
             this.uniforms.forward.value = this.forward ? 1 : 0
 
             // Recalculate, but backward
             if(!this.forward)
-                this.smallestRotation = smallestAngle(this.rotation + Math.PI, this.targetRotation)
+                this.smallestAngle = smallestAngle(this.angle + Math.PI, this.targetAngle)
 
             if(this.forward)
             {
-                this.uniforms.progressStartAngle.value = Math.min(0, this.smallestRotation)
-                this.uniforms.progressEndAngle.value = Math.max(0, this.smallestRotation)
+                this.uniforms.progressStartAngle.value = Math.min(0, this.smallestAngle)
+                this.uniforms.progressEndAngle.value = Math.max(0, this.smallestAngle)
             }
             else
             {
-                if(this.smallestRotation > 0)
+                if(this.smallestAngle > 0)
                 {
                     this.uniforms.progressStartAngle.value = - Math.PI
-                    this.uniforms.progressEndAngle.value = - Math.PI + this.smallestRotation
+                    this.uniforms.progressEndAngle.value = - Math.PI + this.smallestAngle
                 }
                 else
                 {
-                    this.uniforms.progressStartAngle.value = Math.PI + this.smallestRotation
+                    this.uniforms.progressStartAngle.value = Math.PI + this.smallestAngle
                     this.uniforms.progressEndAngle.value = Math.PI
                 }
             }

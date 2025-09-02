@@ -252,7 +252,7 @@ export class Player
             this.steering = - this.game.inputs.gamepad.joysticks.items.left.safeX
 
         /**
-         * Touch Joystick
+         * Nipple
          */
         if(this.game.nipple.active && this.game.nipple.progress > 0)
         {
@@ -260,9 +260,10 @@ export class Player
             this.accelerating = Math.pow(this.game.nipple.progress, 3)
             this.boosting = this.game.nipple.progress > 0.999
 
-            let angleDeltaAbs = Math.abs(this.game.nipple.smallestRotation)
-            const angleDeltaSign = Math.sign(this.game.nipple.smallestRotation)
-            const steering = - Math.min(angleDeltaAbs, 1) * angleDeltaSign
+            const angleDeltaAbs = Math.abs(this.game.nipple.smallestAngle)
+            const angleDeltaAbsNormalized = angleDeltaAbs / ((Math.PI * 2 - this.game.nipple.forwardAmplitude) / 2)
+            const angleDeltaSign = Math.sign(this.game.nipple.smallestAngle)
+            const steering = - Math.min(angleDeltaAbsNormalized, 1) * angleDeltaSign
 
             this.steering = steering
 
@@ -272,48 +273,6 @@ export class Player
                 this.steering *= -1
             }
         }
-
-        /**
-         * Nipple
-         */
-        // if(this.game.inputs.nipple.active && this.game.inputs.nipple.strength > 0.2)
-        // {
-        //     this.game.view.focusPoint.isTracking = true
-        //     this.accelerating = Math.pow(this.game.inputs.nipple.strength, 3)
-        //     this.boosting = this.game.inputs.nipple.strength > 0.999
-
-        //     let vehicleAngle = Math.atan2(this.game.physicalVehicle.forward.z, this.game.physicalVehicle.forward.x)
-        //     const nippleAngle = this.game.inputs.nipple.angle - Math.PI * 0.25
-        //     let angleDelta = smallestAngle(vehicleAngle, nippleAngle)
-        //     let angleDeltaAbs = Math.abs(angleDelta)
-
-        //     const nippleForwardAmplitude = Math.PI * 1.5
-        //     const forward = angleDeltaAbs < nippleForwardAmplitude / 2
-
-        //     this.game.inputs.nipple.forward.setAngle(vehicleAngle + Math.PI * 0.25)
-        //     this.game.inputs.nipple.forward.setAmplitude(nippleForwardAmplitude)
-        //     this.game.inputs.nipple.setThick(this.boosting)
-            
-        //     if(forward)
-        //     {
-        //         const angleDeltaSign = Math.sign(angleDelta)
-        //         const steering = - Math.min(angleDeltaAbs, 1) * angleDeltaSign
-
-        //         this.steering = steering
-        //     }
-        //     else
-        //     {
-        //         this.accelerating *= -1
-
-        //         vehicleAngle += Math.PI
-        //         angleDelta = smallestAngle(vehicleAngle, nippleAngle)
-        //         angleDeltaAbs = Math.abs(angleDelta)
-        //         const angleDeltaSign = Math.sign(angleDelta)
-        //         const steering = - Math.min(angleDeltaAbs, 1) * angleDeltaSign
-
-        //         this.steering = -steering
-        //     }
-        // }
     }
 
     updatePostPhysics()
