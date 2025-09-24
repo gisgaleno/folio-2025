@@ -317,103 +317,107 @@ export class Projects
     setImages()
     {
         this.images = {}
+        this.images.initiated = false
         this.images.width = 1920 * 0.5
         this.images.height = 1080 * 0.5
         this.images.index = 0
         this.images.direction = Projects.DIRECTION_NEXT
+        this.images.resources = new Map()
+        this.images.loadProgress = uniform(0)
+        this.images.animationProgress = uniform(0)
+        this.images.animationDirection = uniform(0)
 
         // Mesh
         this.images.mesh = this.references.get('images')[0]
         this.images.mesh.receiveShadow = true
         this.images.mesh.castShadow = false
+        this.images.mesh.visible = false // Wait for first load to display
 
-        // Sources
-        this.images.resources = new Map()
-
-        // Textures (based on dummy image first)
-        const dummyImageOld = new Image()
-        dummyImageOld.width = this.images.width
-        dummyImageOld.height = this.images.height
-
-        const dummyImageNew = new Image()
-        dummyImageNew.width = this.images.width
-        dummyImageNew.height = this.images.height
-
-        this.images.textureOld = new THREE.Texture(dummyImageOld)
-        this.images.textureOld.colorSpace = THREE.SRGBColorSpace
-        this.images.textureOld.flipY = false
-        this.images.textureOld.magFilter = THREE.LinearFilter
-        this.images.textureOld.minFilter = THREE.LinearFilter
-        this.images.textureOld.generateMipmaps = false
-        
-        this.images.textureNew = new THREE.Texture(dummyImageNew)
-        this.images.textureNew.colorSpace = THREE.SRGBColorSpace
-        this.images.textureNew.flipY = false
-        this.images.textureNew.magFilter = THREE.LinearFilter
-        this.images.textureNew.minFilter = THREE.LinearFilter
-        this.images.textureNew.generateMipmaps = false
-
-        this.images.oldResource = this.images.textureNew.source
-
-        this.images.loadProgress = uniform(0)
-        this.images.animationProgress = uniform(0)
-        this.images.animationDirection = uniform(0)
-
-        // Color node
-        const colorNode = Fn(() =>
+        // Finishing initiating and use first image as default resource
+        this.images.init = (key) =>
         {
-            const uvOld = uv().toVar()
-            const uvNew = uv().toVar()
+            this.images.initiated = true
 
-            // Parallax (add an offset according to progress)
-            uvNew.x.addAssign(this.images.animationProgress.oneMinus().mul(-0.25).mul(this.images.animationDirection))
-            uvOld.x.addAssign(this.images.animationProgress.mul(0.25).mul(this.images.animationDirection))
+            this.images.mesh.visible = true
 
-            // Textures
-            const textureOldColor = texture(this.images.textureOld, uvOld).rgb
-            const textureNewColor = texture(this.images.textureNew, uvNew).rgb
+            const resource = this.images.resources.get(key)
 
-            // Load mix
-            textureNewColor.assign(mix(color('#333333'), textureNewColor, this.images.loadProgress))
+            this.images.textureOld = new THREE.Texture(resource.image)
+            this.images.textureOld.colorSpace = THREE.SRGBColorSpace
+            this.images.textureOld.flipY = false
+            this.images.textureOld.magFilter = THREE.LinearFilter
+            this.images.textureOld.minFilter = THREE.LinearFilter
+            this.images.textureOld.generateMipmaps = false
+            
+            this.images.textureNew = new THREE.Texture(resource.image)
+            this.images.textureNew.colorSpace = THREE.SRGBColorSpace
+            this.images.textureNew.flipY = false
+            this.images.textureNew.magFilter = THREE.LinearFilter
+            this.images.textureNew.minFilter = THREE.LinearFilter
+            this.images.textureNew.generateMipmaps = false
 
-            // Reveal
-            const reveal = uv().x.toVar()
-            If(this.images.animationDirection.greaterThan(0), () =>
+            this.images.oldResource = this.images.textureNew.source
+
+            // Color node
+            const colorNode = Fn(() =>
             {
-                reveal.assign(reveal.oneMinus())
+                const uvOld = uv().toVar()
+                const uvNew = uv().toVar()
+
+                // Parallax (add an offset according to progress)
+                uvNew.x.addAssign(this.images.animationProgress.oneMinus().mul(-0.25).mul(this.images.animationDirection))
+                uvOld.x.addAssign(this.images.animationProgress.mul(0.25).mul(this.images.animationDirection))
+
+                // Textures
+                const textureOldColor = texture(this.images.textureOld, uvOld).rgb
+                const textureNewColor = texture(this.images.textureNew, uvNew).rgb
+
+                // Load mix
+                textureNewColor.assign(mix(color('#333333'), textureNewColor, this.images.loadProgress))
+
+                // Reveal
+                const reveal = uv().x.toVar()
+                If(this.images.animationDirection.greaterThan(0), () =>
+                {
+                    reveal.assign(reveal.oneMinus())
+                })
+                const threshold = step(this.images.animationProgress, reveal)
+
+                const textureColor = mix(textureNewColor, textureOldColor, threshold)
+                return textureColor
+
+            })()
+            
+            // Material
+            this.images.material = new MeshDefaultMaterial({
+                colorNode: colorNode,
+                hasWater: false
             })
-            const threshold = step(this.images.animationProgress, reveal)
 
-            const textureColor = mix(textureNewColor, textureOldColor, threshold)
-            return textureColor
+            const baseOutput = this.images.material.outputNode
+            
+            this.images.material.outputNode = Fn(() =>
+            {
+                return vec4(
+                    mix(
+                        baseOutput.rgb,
+                        colorNode,
+                        this.shadeMix.images.mixUniform
+                    ),
+                    baseOutput.a
+                )
+            })()
+            
 
-        })()
-        
-        // Material
-        this.images.material = new MeshDefaultMaterial({
-            colorNode: colorNode,
-            hasWater: false
-        })
-
-        const baseOutput = this.images.material.outputNode
-        
-        this.images.material.outputNode = Fn(() =>
-        {
-            return vec4(
-                mix(
-                    baseOutput.rgb,
-                    colorNode,
-                    this.shadeMix.images.mixUniform
-                ),
-                baseOutput.a
-            )
-        })()
-        
-        this.images.mesh.material = this.images.material
+            this.images.mesh.material = this.images.material
+        }
 
         // Load ended
         this.images.loadEnded = (key) =>
         {
+            if(!this.images.initiated)
+                this.images.init(key)
+
             // Current image => Reveal
             if(this.navigation.current.images[this.images.index] === key)
             {
@@ -519,12 +523,15 @@ export class Projects
             }
 
             // Update textures
-            this.images.textureOld.source = this.images.textureNew.source
-            this.images.textureOld.needsUpdate = true
+            if(this.images.initiated)
+            {
+                this.images.textureOld.source = this.images.textureNew.source
+                this.images.textureOld.needsUpdate = true
 
-            this.images.textureNew.source = resource.source
-            if(resource.loaded)
-                this.images.textureNew.needsUpdate = true
+                this.images.textureNew.source = resource.source
+                if(resource.loaded)
+                    this.images.textureNew.needsUpdate = true
+            }
 
             // Animate right away
             gsap.fromTo(this.images.animationProgress, { value: 0 }, { value: 1, duration: 1, ease: 'power2.inOut', overwrite: true })
