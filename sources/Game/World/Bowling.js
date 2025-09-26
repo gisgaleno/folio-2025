@@ -4,6 +4,7 @@ import { InteractivePoints } from '../InteractivePoints.js'
 import { clamp, lerp } from '../utilities/maths.js'
 import gsap from 'gsap'
 import { color, float, Fn, mix, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
+import { InstancedGroup } from '../InstancedGroup.js'
 
 export class Bowling
 {
@@ -38,41 +39,83 @@ export class Bowling
     {
         this.pins = {}
         this.pins.items = []
-        this.pins.downCount = 0
+        
+        // References
+        const references = InstancedGroup.getReferencesFromChildren(this.references.get('pinPositions')[0].children)
 
-        const basePins = [
-            this.references.get('pinA')[0],
-            this.references.get('pinB')[0],
-            this.references.get('pinC')[0],
-            this.references.get('pinD')[0],
-            this.references.get('pinE')[0],
-            this.references.get('pinF')[0],
-            this.references.get('pinG')[0],
-            this.references.get('pinH')[0],
-            this.references.get('pinI')[0],
-            this.references.get('pinJ')[0],
-        ]
+        // Instances
+        const basePin = this.references.get('pin')[0]
+        const descriptions = this.game.objects.getFromModel(
+            basePin,
+            {
+
+            },
+            {
+                friction: 0.5,
+                restitution: 0.1,
+            }
+        )
 
         let i = 0
-        for(const basePin of basePins)
+        for(const reference of references)
         {
             const pin = {}
             pin.index = i
             pin.isDown = false
             pin.isSleeping = true
-            pin.group = basePin
-            pin.body = basePin.userData.object.physical.body
-            pin.basePosition = basePin.position.clone()
-            pin.baseRotation = basePin.quaternion.clone()
+            pin.group = reference
 
-            const collidersCount = pin.body.numColliders()
-            for(let i = 0; i < collidersCount; i++)
-                pin.body.collider(i).setMass(0.03)
+
+            // Object with physics linked to reference
+            const object = this.game.objects.add(
+                {
+                    model: reference,
+                    updateMaterials: false,
+                    castShadow: false,
+                    receiveShadow: false,
+                    parent: null,
+                },
+                {
+                    type: 'dynamic',
+                    position: reference.position,
+                    rotation: reference.quaternion,
+                    friction: 0.1,
+                    resitution: 0.5,
+                    sleeping: true,
+                    colliders: descriptions[1].colliders,
+                    waterGravityMultiplier: - 1,
+                    collidersOverwrite:
+                    {
+                        mass: 0.06
+                    }
+                },
+            )
+
+            pin.body = object.physical.body
+            pin.basePosition = pin.group.position.clone()
+            pin.baseRotation = pin.group.quaternion.clone()
 
             this.pins.items.push(pin)
+
             i++
         }
 
+        basePin.position.set(0, 0, 0)
+        basePin.rotation.set(0, 0, 0)
+        basePin.frustumCulled = false
+
+        this.game.objects.add(
+            {
+                model: basePin,
+                parent: null
+            },
+            null
+        )
+        basePin.removeFromParent()
+
+        this.testInstancedGroup = new InstancedGroup(references, basePin, true)
+
+        // Reset
         this.pins.reset = () =>
         {
             for(const pin of this.pins.items)

@@ -136,24 +136,27 @@ export class Areas
             // References
             this.references.parse(child)
 
-            // Objects
-            this.game.objects.addFromModel(
-                child,
-                {
-
-                },
-                {
-                    friction: child.userData.friction ?? 0.5,
-                    restitution: child.userData.restitution ?? 0.1,
-                    position: child.position,
-                    rotation: child.quaternion,
-                    sleeping: true,
-                    collidersOverwrite:
+            if(typeof child.userData.preventAutoAdd === 'undefined' || child.userData.preventAutoAdd === false)
+            {
+                // Objects
+                this.game.objects.addFromModel(
+                    child,
                     {
-                        mass: child.userData.mass ?? 1
+
+                    },
+                    {
+                        friction: child.userData.friction ?? 0.5,
+                        restitution: child.userData.restitution ?? 0.1,
+                        position: child.position,
+                        rotation: child.quaternion,
+                        sleeping: true,
+                        collidersOverwrite:
+                        {
+                            mass: child.userData.mass ?? 1
+                        }
                     }
-                }
-            )
+                )
+            }
         }
     }
 }

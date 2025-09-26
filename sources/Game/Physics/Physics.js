@@ -121,10 +121,19 @@ export class Physics
         physical.body = this.world.createRigidBody(rigidBodyDesc)
 
         // Colliders
+        let collidersOverwrite = {}
+        if(typeof _physicalDescription.collidersOverwrite !== 'undefined')
+            collidersOverwrite = _physicalDescription.collidersOverwrite
+
         physical.colliders = []
-        for(const _colliderDescription of _physicalDescription.colliders)
+        for(let _colliderDescription of _physicalDescription.colliders)
         {
             let colliderDescription = RAPIER.ColliderDesc
+
+            _colliderDescription = {
+                ..._colliderDescription,
+                ...collidersOverwrite
+            }
 
             if(_colliderDescription.shape === 'cuboid')
                 colliderDescription = colliderDescription.cuboid(..._colliderDescription.parameters)

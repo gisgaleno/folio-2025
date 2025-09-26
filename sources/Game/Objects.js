@@ -105,7 +105,7 @@ export class Objects
         return object
     }
 
-    addFromModel(_model, _visualDescription = {}, _physicalDescription = {})
+    getFromModel(_model, _visualDescription = {}, _physicalDescription = {})
     {
         // Extract physical from direct children and remove from scene
         const physical = _model.children.find(_child => _child.name.startsWith('physical'))
@@ -128,14 +128,9 @@ export class Objects
 
             for(const _physical of physical.children)
             {
-                let collidersOverwrite = {}
-                if(typeof _physicalDescription.collidersOverwrite !== 'undefined')
-                    collidersOverwrite = _physicalDescription.collidersOverwrite
-
                 const collider = {
                     position: _physical.position,
                     quaternion: _physical.quaternion,
-                    ...collidersOverwrite
                 }
                 if(_physical.name.match(/^trimesh/i))
                 {
@@ -168,10 +163,16 @@ export class Objects
         }
         
         // Add
-        return this.add(
+        return [
             { ..._visualDescription, model: _model },
             physical ? { ..._physicalDescription, colliders: colliders } : null
-        )
+        ]
+    }
+
+    addFromModel(_model, _visualDescription = {}, _physicalDescription = {})
+    {
+        // Add
+        return this.add(...this.getFromModel(_model, _visualDescription, _physicalDescription))
     }
 
     reset()
