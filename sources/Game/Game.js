@@ -90,6 +90,7 @@ export class Game
                 [ 'interactivePointsKeyIconEnterTexture',  'interactivePoints/interactivePointsKeyIconEnter.png',  'texture', (resource) => { resource.flipY = true; resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false } ],
                 [ 'interactivePointsKeyIconATexture',      'interactivePoints/interactivePointsKeyIconA.png',      'texture', (resource) => { resource.flipY = true; resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false } ],
                 [ 'respawnsModel',                         'respawns/respawns.glb',                                'gltf'    ],
+                [ 'jukeboxMusicNotes',                     'jukebox/jukeboxMusicNotes.png',                        'texture', (resource) => {  } ],
 
                 // [ 'easterEggVisualModel',                 'easter/easterEggVisual.glb',                   'gltf'    ],
                 // [ 'easterEggReferencesModel',             'easter/easterEggReferences.glb',               'gltf'    ],

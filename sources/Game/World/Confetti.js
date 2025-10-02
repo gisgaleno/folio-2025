@@ -15,7 +15,7 @@ export class Confetti
         {
             this.debugPanel = this.game.debug.panel.addFolder({
                 title: '🎉 Confetti',
-                expanded: true,
+                expanded: false,
             })
         }
 
@@ -38,6 +38,7 @@ export class Confetti
             this.game.debug.addThreeColorBinding(this.debugPanel, this.colorsUniform.array[0], 'color0')
             this.game.debug.addThreeColorBinding(this.debugPanel, this.colorsUniform.array[1], 'color1')
             this.game.debug.addThreeColorBinding(this.debugPanel, this.colorsUniform.array[2], 'color2')
+            this.debugPanel.addButton({ title: 'pop' }).on('click', () => { this.pop(this.game.player.position) })
         }
     }
 
