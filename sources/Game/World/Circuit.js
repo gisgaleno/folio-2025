@@ -338,9 +338,10 @@ export default class Circuit
         {
             this.checkpoints.doorTarget = {}
             this.checkpoints.doorTarget.scaleUniform = uniform(2)
+            this.checkpoints.doorTarget.color = uniform(color('#32ffc1'))
 
             const material = new THREE.MeshBasicNodeMaterial({ transparent: true, side: THREE.DoubleSide })
-            material.outputNode = doorOutputColor(color('#33ffd3'), this.checkpoints.doorTarget.scaleUniform)
+            material.outputNode = doorOutputColor(this.checkpoints.doorTarget.color, this.checkpoints.doorTarget.scaleUniform)
             
             const mesh = new THREE.Mesh(doorGeometry, material)
             mesh.scale.x = 1
@@ -356,9 +357,10 @@ export default class Circuit
         {
             this.checkpoints.doorReached = {}
             this.checkpoints.doorReached.scaleUniform = uniform(2)
+            this.checkpoints.doorReached.color = uniform(color('#cbff62'))
             
             const material = new THREE.MeshBasicNodeMaterial({ transparent: true, side: THREE.DoubleSide })
-            material.outputNode = doorOutputColor(color('#cbff62'), this.checkpoints.doorReached.scaleUniform)
+            material.outputNode = doorOutputColor(this.checkpoints.doorReached.color, this.checkpoints.doorReached.scaleUniform)
             
             const mesh = new THREE.Mesh(doorGeometry, material)
             mesh.scale.x = 1
@@ -374,11 +376,11 @@ export default class Circuit
         // Debug
         if(this.game.debug.active)
         {
-            // const debugPanel = this.debugPanel.addFolder({ title: 'checkpoints' })
-            // this.game.debug.addThreeColorBinding(debugPanel, this.checkpoints.targetColor, 'targetColor')
-            // this.game.debug.addThreeColorBinding(debugPanel, this.checkpoints.reachedColor, 'reachedColor')
+            const debugPanel = this.debugPanel.addFolder({ title: 'checkpoints' })
+            this.game.debug.addThreeColorBinding(debugPanel, this.checkpoints.doorTarget.color.value, 'targetColor')
+            this.game.debug.addThreeColorBinding(debugPanel, this.checkpoints.doorReached.color.value, 'reachedColor')
             
-            // debugPanel.addBinding(this.checkpoints.intensity, 'value', { label: 'intensity', min: 0, max: 5, step: 0.01 })
+            debugPanel.addBinding(doorIntensity, 'value', { label: 'intensity', min: 0, max: 5, step: 0.01 })
         }
     }
 
