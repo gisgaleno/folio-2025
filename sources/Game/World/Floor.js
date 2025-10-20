@@ -33,7 +33,8 @@ export class Floor
     {
         this.size = Math.round(this.game.view.optimalArea.radius * 2) + 1
         this.halfSize = this.size * 0.5
-        this.subdivisions = this.size
+        this.cellSize = 1.5
+        this.subdivisions = this.size / this.cellSize
 
         // Geometry
         let geometry = new THREE.PlaneGeometry(this.size, this.size, this.subdivisions, this.subdivisions)
@@ -70,7 +71,8 @@ export class Floor
             normalNode: vec3(0, 1, 0),
             shadowNode: terrainData.g,
             hasWater: false,
-            hasLightBounce: false
+            hasLightBounce: false,
+            wireframe: false
         })
         // Displacement
         material.positionNode = Fn(() =>
@@ -151,7 +153,7 @@ export class Floor
 
     update()
     {
-        this.mesh.position.x = Math.round(this.game.view.optimalArea.position.x)
-        this.mesh.position.z = Math.round(this.game.view.optimalArea.position.z)
+        this.mesh.position.x = Math.round(this.game.view.optimalArea.position.x / this.cellSize) * this.cellSize
+        this.mesh.position.z = Math.round(this.game.view.optimalArea.position.z / this.cellSize) * this.cellSize
     }
 }
