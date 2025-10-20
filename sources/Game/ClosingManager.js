@@ -12,7 +12,7 @@ export class ClosingManager
 
         this.game.inputs.addActions([
             { name: 'close', categories: [ 'modal', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.Escape', 'Gamepad.cross' ] },
-            { name: 'pause', categories: [ 'modal', 'racing', 'cinematic', 'wandering' ], keys: [ 'Keyboard.KeyP', 'Gamepad.start' ] }
+            { name: 'pause', categories: [ 'modal', 'racing', 'cinematic', 'wandering' ], keys: [ 'Gamepad.start' ] }
         ])
         
         // Close input => Go through everything that can be closed
