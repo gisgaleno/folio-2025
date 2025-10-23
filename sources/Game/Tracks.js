@@ -68,6 +68,11 @@ export class Tracks
         return track
     }
 
+    remove(track)
+    {
+        this.tracks = this.tracks.filter(_track => _track !== track)
+    }
+
     update()
     {
         this.camera.position.x = this.focusPoint.x

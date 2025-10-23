@@ -44,17 +44,13 @@ export class ResourcesLoader
             // Progress
             const progress = () =>
             {
-                // // Fake timing
-                // window.setTimeout(() =>
-                // {
-                    toLoad--
+                toLoad--
 
-                    if(typeof _progressCallback === 'function')
-                        _progressCallback(toLoad, _files.length)
-                    
-                    if(toLoad === 0)
-                        resolve(loadedResources)
-                // }, Math.random() * 1500)
+                if(typeof _progressCallback === 'function')
+                    _progressCallback(toLoad, _files.length)
+                
+                if(toLoad === 0)
+                    resolve(loadedResources)
             }
 
             // Save
@@ -84,6 +80,9 @@ export class ResourcesLoader
                 // In cache
                 if(this.cache.has(_file[1]))
                 {
+                    // Save cached file directly in resources object
+                    loadedResources[_file[0]] = this.cache.get(_file[1])
+
                     progress()
                 }
 

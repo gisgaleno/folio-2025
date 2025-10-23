@@ -26,12 +26,11 @@ export class Events
         // Remove specific
         if(typeof _callback === 'function')
         {
-            const callbacks = this.callbacks[_name]
-            
-            for(const order in this.callbacks)
+            for(const order in this.callbacks[_name])
             {
                 // Find
-                const index = callbacks[order][_name].indexOf(_callback)
+                const callbacks = this.callbacks[_name][order]
+                const index = callbacks.indexOf(_callback)
 
                 if(index !== -1)
                     callbacks.splice(index, 1)

@@ -9,10 +9,12 @@ import gsap from 'gsap'
 
 export class VisualVehicle
 {
-    constructor()
+    constructor(model)
     {
         this.game = Game.getInstance()
         
+        this.model = model
+
         this.setParts()
         this.setMainGroundTrack()
         this.setWheels()
@@ -22,17 +24,59 @@ export class VisualVehicle
         this.setBoostAnimation()
         this.setScreenPosition()
 
-        this.game.ticker.events.on('tick', () =>
+        this.tickCallback = () =>
         {
             this.update()
-        }, 6)
+        }
+        this.game.ticker.events.on('tick', this.tickCallback, 6)
+    }
+
+    destroy()
+    {
+        this.game.ticker.events.off('tick', this.tickCallback)
+
+        if(this.blinkers)
+        {
+            this.game.inputs.events.off('left', this.blinkers.leftCallback)
+            this.game.inputs.events.off('right', this.blinkers.rightCallback)
+        }
+
+        for(let partName in this.parts)
+        {
+            const part = this.parts[partName]
+            part.removeFromParent()
+        }
+
+        this.game.tracks.remove(this.mainGroundTrack)
+
+        for(const wheel of this.wheels.items)
+        {
+            this.game.tracks.remove(wheel.groundTrack)
+        }
     }
 
     setParts()
     {
         this.parts = {}
 
-        this.game.resources.vehicle.scene.traverse((child) =>
+        const searchList = [
+            'chassis',
+            'blinkerLeft',
+            'blinkerRight',
+            'stopLights',
+            'wheelContainer',
+            'antenna',
+            'cell1',
+            'cell2',
+            'cell3',
+            'energy',
+        ]
+        for(let i = 0; i < searchList.length; i++)
+        {
+            searchList[i] = new RegExp(`^(${searchList[i]})`, 'i')
+        }
+
+        this.model.traverse((child) =>
         {
             if(child.isMesh)
             {
@@ -40,40 +84,37 @@ export class VisualVehicle
                 child.castShadow = true
                 child.material.shadowSide = THREE.BackSide
             }
+
+            for(const search of searchList)
+            {
+                const match = child.name.match(search)
+
+                if(match)
+                {
+                    this.parts[match[0]] = child
+                }
+            }
         })
 
         // Chassis
-        this.parts.chassis = this.game.resources.vehicle.scene.getObjectByName('chassis')
         this.parts.chassis.rotation.reorder('YXZ')
         this.game.materials.updateObject(this.parts.chassis)
         this.game.scene.add(this.parts.chassis)
 
         // Blinker left
-        this.parts.blinkerLeft = this.parts.chassis.getObjectByName('blinkerLeft')
-        this.parts.blinkerLeft.visible = false
+        if(this.parts.blinkerLeft)
+            this.parts.blinkerLeft.visible = false
 
         // Blinker right
-        this.parts.blinkerRight = this.parts.chassis.getObjectByName('blinkerRight')
-        this.parts.blinkerRight.visible = false
+        if(this.parts.blinkerRight)
+            this.parts.blinkerRight.visible = false
 
         // Stop lights
-        this.parts.stopLights = this.parts.chassis.getObjectByName('stopLights')
-        this.parts.stopLights.visible = false
+        if(this.parts.stopLights)
+            this.parts.stopLights.visible = false
 
         // Wheel
-        this.parts.wheelContainer = this.game.resources.vehicle.scene.getObjectByName('wheelContainer')
         this.game.materials.updateObject(this.parts.wheelContainer)
-
-        // Antenna
-        this.parts.antenna = this.parts.chassis.getObjectByName('antenna')
-
-        // Cells
-        this.parts.cell1 = this.parts.chassis.getObjectByName('cell1')
-        this.parts.cell2 = this.parts.chassis.getObjectByName('cell2')
-        this.parts.cell3 = this.parts.chassis.getObjectByName('cell3')
-
-        // Energy
-        this.parts.energy = this.parts.chassis.getObjectByName('energy')
     }
 
     setMainGroundTrack()
@@ -97,11 +138,15 @@ export class VisualVehicle
             wheel.container = this.parts.wheelContainer.clone(true)
             this.parts.chassis.add(wheel.container)
 
-            // Suspension
-            wheel.suspension = wheel.container.getObjectByName('wheelSuspension')
+            wheel.container.traverse((child) =>
+            {
+                if(child.name.match(/^wheelSuspension/))
+                    wheel.suspension = child
+                if(child.name.match(/^wheelCylinder/))
+                    wheel.cylinder = child
+            })
             
             // Cylinder (actual wheel)
-            wheel.cylinder = wheel.container.getObjectByName('wheelCylinder')
             wheel.cylinder.position.set(0, 0, 0)
             
             if(i === 0 || i === 2)
@@ -116,6 +161,11 @@ export class VisualVehicle
 
     setBlinkers()
     {
+        if(!this.parts.blinkerLeft)
+            return
+            
+        this.blinkers = {}
+
         let running = false
         let on = false
 
@@ -150,17 +200,20 @@ export class VisualVehicle
             }
         }
 
-        this.game.inputs.events.on('left', (active) =>
+        this.blinkers.leftCallback = (active) =>
         {
             if(active.active)
                 start()
-        })
+        }
+        
+        this.blinkers.rightCallback = (active) =>
+        {
+            if(active.active)
+                start()
+        }
 
-        this.game.inputs.events.on('right', (active) =>
-        {
-            if(active.active)
-                start()
-        })
+        this.game.inputs.events.on('left', this.blinkers.leftCallback)
+        this.game.inputs.events.on('right', this.blinkers.rightCallback)
     }
 
     setAntenna()
@@ -208,6 +261,7 @@ export class VisualVehicle
         this.boostAnimation.mixUniform = uniform(0)
 
         // Energy
+        if(this.parts.energy)
         {
             const emissiveOuput = this.game.materials.getFromName('emissivePurpleRadialGradient').outputNode
             const defaultOutput = this.parts.energy.material.outputNode
@@ -266,8 +320,11 @@ export class VisualVehicle
             visualWheel.container.position.y += (wheelY - visualWheel.container.position.y) * 25 * this.game.ticker.deltaScaled
             visualWheel.container.position.z = physicalWheel.basePosition.z
 
-            const suspensionScale = Math.abs(visualWheel.container.position.y) - 0.5
-            visualWheel.suspension.scale.y = suspensionScale
+            if(visualWheel.suspension)
+            {
+                const suspensionScale = Math.abs(visualWheel.container.position.y) - 0.5
+                visualWheel.suspension.scale.y = suspensionScale
+            }
 
             // Ground tracks
             visualWheel.groundTrack.update(physicalWheel.contactPoint, physicalWheel.inContact)
@@ -308,9 +365,12 @@ export class VisualVehicle
         this.boostAnimation.mix = clamp(this.boostAnimation.mix, 0, 1)
         // this.boostAnimation.mixUniform.value = remapClamp(this.boostAnimation.mix, 0, 0.2, 0, 1)
         this.boostAnimation.mixUniform.value = 1 - Math.pow(1 - this.boostAnimation.mix, 7)
-        this.parts.cell1.position.y = remapClamp(this.boostAnimation.mix, 0, 0.6, 0.2, 0)
-        this.parts.cell3.position.y = remapClamp(this.boostAnimation.mix, 0.2, 0.8, 0.2, 0)
-        this.parts.cell2.position.y = remapClamp(this.boostAnimation.mix, 0.4, 1, 0.2, 0)
+        if(this.parts.energy)
+        {
+            this.parts.cell1.position.y = remapClamp(this.boostAnimation.mix, 0, 0.6, 0.2, 0)
+            this.parts.cell3.position.y = remapClamp(this.boostAnimation.mix, 0.2, 0.8, 0.2, 0)
+            this.parts.cell2.position.y = remapClamp(this.boostAnimation.mix, 0.4, 1, 0.2, 0)
+        }
 
         // Screen position
         const vector = new THREE.Vector3()

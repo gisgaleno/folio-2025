@@ -38,6 +38,7 @@ import { ClosingManager } from './ClosingManager.js'
 import { RayCursor } from './RayCursor.js'
 import { Water } from './Water.js'
 import { Reveal } from './Reveal.js'
+import { KonamiCode } from './KonamiCode.js'
 
 export class Game
 {
@@ -154,6 +155,7 @@ export class Game
         this.interactivePoints = new InteractivePoints()
         this.overlay = new Overlay()
         this.closingManager = new ClosingManager()
+        this.konamiCode = new KonamiCode()
         // this.monitoring = new Monitoring()
         this.world.init(1)
 
