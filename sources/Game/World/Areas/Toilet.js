@@ -1,15 +1,15 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
+import { Game } from '../../Game.js'
+import { Area } from './Area.js'
 
-export class Toilet
+export class Toilet extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
-
-        this.references = references
+        super(references)
 
         this.setCandleFlames()
+        this.setAchievement()
     }
 
     setCandleFlames()
@@ -20,6 +20,14 @@ export class Toilet
         this.game.dayCycles.events.on('lights', (inInverval) =>
         {
             mesh.visible = inInverval
+        })
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('toiletEnter', 1)
         })
     }
 }

@@ -1,17 +1,18 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
+import { Game } from '../../Game.js'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
-import { InstancedGroup } from '../InstancedGroup.js'
+import { InstancedGroup } from '../../InstancedGroup.js'
 import gsap from 'gsap'
-import { InteractivePoints } from '../InteractivePoints.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { alea } from 'seedrandom'
+import { Area } from './Area.js'
 
-export class CookieStand
+export class CookieStand extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
         if(this.game.debug.active)
         {
@@ -21,8 +22,6 @@ export class CookieStand
             })
         }
 
-        this.references = references
-
         this.setBlower()
         this.setBanner()
         this.setParticles()
@@ -31,6 +30,7 @@ export class CookieStand
         this.setActualCookies()
         this.setInteractivePoint()
         this.setCounter()
+        this.setAchievement()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -406,6 +406,14 @@ export class CookieStand
         this.game.server.events.on('connected', () =>
         {
             this.counter.init()
+        })
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('cookieEnter', 1)
         })
     }
 

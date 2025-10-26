@@ -1,6 +1,5 @@
-import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { PoleLights } from './PoleLights.js'
+import { Game } from '../../Game.js'
+// import { PoleLights } from '../PoleLights.js'
 import { Altar } from './Altar.js'
 import { CookieStand } from './CookieStand.js'
 import { Bonfire } from './Bonfire.js'
@@ -11,7 +10,6 @@ import { Lab } from './Lab.js'
 import { Career } from './Career.js'
 import { Social } from './Social.js'
 import { Toilet } from './Toilet.js'
-import { ExplosiveCrates } from './ExplosiveCrates.js'
 import { Bowling } from './Bowling.js'
 import Circuit from './Circuit.js'
 import { BehindTheScene } from './BehindTheScene.js'
@@ -61,9 +59,9 @@ export class Areas
         if(altarReferences.size)
             this.altar = new Altar(altarReferences)
 
-        const poleLightsReferences = this.references.getStartingWith('poleLights')
-        if(poleLightsReferences.size)
-            this.poleLights = new PoleLights(poleLightsReferences)
+        // const poleLightsReferences = this.references.getStartingWith('poleLights')
+        // if(poleLightsReferences.size)
+        //     this.poleLights = new PoleLights(poleLightsReferences)
             
         const cookieReferences = this.references.getStartingWith('cookie')
         if(cookieReferences.size)

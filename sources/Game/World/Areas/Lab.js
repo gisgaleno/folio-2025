@@ -1,15 +1,16 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { InteractivePoints } from '../InteractivePoints.js'
+import { Game } from '../../Game.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
 import gsap from 'gsap'
-import labData from '../../data/lab.js'
-import { TextCanvas } from '../TextCanvas.js'
+import labData from '../../../data/lab.js'
+import { TextCanvas } from '../../TextCanvas.js'
 import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, positionWorld, sin, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
-import { remapClamp, safeMod, signedModDelta } from '../utilities/maths.js'
-import { Inputs } from '../Inputs/Inputs.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { remapClamp, safeMod, signedModDelta } from '../../utilities/maths.js'
+import { Inputs } from '../../Inputs/Inputs.js'
+import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
+import { Area } from './Area.js'
 
-export class Lab
+export class Lab extends Area
 {
     static DIRECTION_PREVIOUS = 1
     static DIRECTION_NEXT = 2
@@ -20,7 +21,7 @@ export class Lab
 
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
         // Debug
         if(this.game.debug.active)
@@ -31,7 +32,6 @@ export class Lab
             })
         }
         
-        this.references = references
         this.state = Lab.STATE_CLOSED
 
         this.setInteractivePoint()
@@ -50,6 +50,7 @@ export class Lab
         this.setBlackBoard()
         this.setCandleFlames()
         this.setCauldron()
+        this.setAchievement()
 
         this.changeProject(0)
         this.scroller.progress = this.scroller.targetProgress
@@ -1261,7 +1262,14 @@ export class Lab
                 this.game.debug.addThreeColorBinding(debugPanel, colorB.value, 'colorB')
             }
         }
+    }
 
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('labEnter', 1)
+        })
     }
 
     open()

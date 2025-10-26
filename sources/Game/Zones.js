@@ -10,8 +10,6 @@ export class Zones
 
         this.items = []
 
-        this.events = new Events()
-
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
@@ -31,23 +29,35 @@ export class Zones
         }
     }
 
-    add(name, position, radius)
+    create(type = 'sphere', position, radius)
     {
-        this.items.push({ name, position, radius, isIn: false })
+        const zone = { type, position, radius, isIn: false }
+        zone.events = new Events()
+        this.items.push(zone)
 
         // Preview
-        const preview = new THREE.Mesh(
+        zone.preview = new THREE.Mesh(
             new THREE.SphereGeometry(radius, 16, 16),
             new THREE.MeshBasicNodeMaterial({ color: '#ffffff', wireframe: true })
         )
-        preview.position.copy(position)
-        this.previewGroup.add(preview)
+        zone.preview.position.copy(position)
+        this.previewGroup.add(zone.preview)
+
+        return zone
     }
 
     update()
     {
         for(const zone of this.items)
         {
+            let playerPosition = this.game.player.position
+            let zonePosition = zone.position
+
+            if(zone.type === 'cylinder')
+            {
+                playerPosition = new THREE.Vector2(playerPosition.x, playerPosition.z)
+                zonePosition = new THREE.Vector2(zonePosition.x, zonePosition.z)
+            }
             const distance = this.game.player.position.distanceTo(zone.position)
 
             if(distance < zone.radius)
@@ -55,7 +65,7 @@ export class Zones
                 if(!zone.isIn)
                 {
                     zone.isIn = true
-                    this.events.trigger(zone.name, [ zone ])
+                    zone.events.trigger('enter', [ zone ])
                 }
             }
             else
@@ -63,7 +73,7 @@ export class Zones
                 if(zone.isIn)
                 {
                     zone.isIn = false
-                    this.events.trigger(zone.name, [ zone ])
+                    zone.events.trigger('leave', [ zone ])
                 }
             }
         }

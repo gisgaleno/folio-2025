@@ -1,16 +1,16 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { InteractivePoints } from '../InteractivePoints.js'
-import socialData from '../../data/social.js'
-import { InstancedGroup } from '../InstancedGroup.js'
+import { Game } from '../../Game.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import socialData from '../../../data/social.js'
+import { InstancedGroup } from '../../InstancedGroup.js'
+import { Area } from './Area.js'
 
-export class Social
+export class Social extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
-        this.references = references
         this.center = this.references.get('center')[0].position
 
         // Debug
@@ -25,6 +25,7 @@ export class Social
         this.setLinks()
         this.setFans()
         this.setOnlyFans()
+        this.setAchievement()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -176,6 +177,14 @@ export class Social
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             }
         )
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('socialEnter', 1)
+        })
     }
 
     update()

@@ -1,14 +1,15 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { InteractivePoints } from '../InteractivePoints.js'
+import { Game } from '../../Game.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
 import gsap from 'gsap'
-import projectsData from '../../data/projects.js'
-import { TextCanvas } from '../TextCanvas.js'
+import projectsData from '../../../data/projects.js'
+import { TextCanvas } from '../../TextCanvas.js'
 import { add, color, float, Fn, If, luminance, mix, mul, normalWorld, positionGeometry, sin, step, texture, uniform, uv, vec3, vec4 } from 'three/tsl'
-import { Inputs } from '../Inputs/Inputs.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { Inputs } from '../../Inputs/Inputs.js'
+import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
+import { Area } from './Area.js'
 
-export class Projects
+export class Projects extends Area
 {
     static DIRECTION_PREVIOUS = 1
     static DIRECTION_NEXT = 2
@@ -19,7 +20,7 @@ export class Projects
 
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
         // Debug
         if(this.game.debug.active)
@@ -30,7 +31,6 @@ export class Projects
             })
         }
         
-        this.references = references
         this.state = Projects.STATE_CLOSED
 
         this.setInteractivePoint()
@@ -52,6 +52,7 @@ export class Projects
         this.setOven()
         this.setGrinder()
         this.setAnvil()
+        this.setAchievement()
 
         this.changeProject(0)
 
@@ -1303,6 +1304,14 @@ export class Projects
         })()
 
         this.anvil.blade.material = material
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('projectsEnter', 1)
+        })
     }
 
     open()

@@ -1,15 +1,14 @@
-import { Game } from '../Game.js'
-import { Inputs } from '../Inputs/Inputs.js'
-import { InteractivePoints } from '../InteractivePoints.js'
-import { Modals } from '../Modals.js'
+import { Game } from '../../Game.js'
+import { Inputs } from '../../Inputs/Inputs.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import { Modals } from '../../Modals.js'
+import { Area } from './Area.js'
 
-export class Controls
+export class Controls extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
-        
-        this.references = references
+        super(references)
 
         this.setModal()
         this.setInteractivePoint()

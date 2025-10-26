@@ -1,14 +1,15 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
+import { Game } from '../../Game.js'
 import { attribute, clamp, color, float, Fn, instancedArray, luminance, max, mix, smoothstep, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { alea } from 'seedrandom'
+import { Area } from './Area.js'
 
-export class Altar
+export class Altar extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
         if(this.game.debug.active)
         {
@@ -18,7 +19,6 @@ export class Altar
             })
         }
 
-        this.references = references
         this.value = 0
         this.position = this.references.get('altar')[0].position.clone()
 
@@ -28,9 +28,10 @@ export class Altar
         this.setBeam()
         this.setBeamParticles()
         this.setCounter()
-        this.setArea()
+        this.setDeathZone()
         this.setSkullEyes()
         this.setData()
+        this.setAchievement()
 
         // Offline counter
         if(!this.game.server.connected)
@@ -262,24 +263,24 @@ export class Altar
         this.references.get('counter')[0].add(this.mesh)
     }
 
-    setArea()
+    setDeathZone()
     {
-        const areaPosition = this.position.clone()
-        areaPosition.y -= 1.25
-        this.game.zones.add('altar', areaPosition, 2.5)
+        const position = this.position.clone()
+        position.y -= 1.25
+        const zone = this.game.zones.create('sphere', position, 2.5)
 
-        this.game.zones.events.on('altar', (area) =>
-        {
-            // Inside the area
-            if(area.isIn)
+        zone.events.on(
+            'enter',
+            () =>
             {
+                // Inside the area
                 this.animateBeam()
                 this.animateBeamParticles()
                 this.data.insert()
                 this.updateValue(this.value + 1)
                 this.game.player.die()
             }
-        })
+        )
     }
 
     setData()
@@ -392,5 +393,13 @@ export class Altar
                 }
             }
         )
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('altarEnter', 1)
+        })
     }
 }

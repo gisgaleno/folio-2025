@@ -1,17 +1,16 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
+import { Game } from '../../Game.js'
 import { color, float, Fn, instancedArray, mix, normalWorld, positionGeometry, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
-import { InteractivePoints } from '../InteractivePoints.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { alea } from 'seedrandom'
+import { Area } from './Area.js'
 
-export class Bonfire
+export class Bonfire extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
-
-        this.references = references
+        super(references)
 
         this.position = this.references.get('bonfire')[0].position
 

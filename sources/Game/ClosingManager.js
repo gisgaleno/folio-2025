@@ -1,8 +1,8 @@
 import { Game } from './Game.js'
 import { Modals } from './Modals.js'
-import Circuit from './World/Circuit.js'
-import { Lab } from './World/Lab.js'
-import { Projects } from './World/Projects.js'
+import Circuit from './World/Areas/Circuit.js'
+import { Lab } from './World/Areas/Lab.js'
+import { Projects } from './World/Areas/Projects.js'
 
 export class ClosingManager
 {

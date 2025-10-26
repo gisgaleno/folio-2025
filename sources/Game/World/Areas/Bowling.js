@@ -1,19 +1,17 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { InteractivePoints } from '../InteractivePoints.js'
-import { clamp, lerp } from '../utilities/maths.js'
+import { Game } from '../../Game.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import { clamp, lerp } from '../../utilities/maths.js'
 import gsap from 'gsap'
 import { color, float, Fn, instancedBufferAttribute, instanceIndex, max, min, mix, positionGeometry, sin, step, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
-import { InstancedGroup } from '../InstancedGroup.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { InstancedGroup } from '../../InstancedGroup.js'
+import { Area } from './Area.js'
 
-export class Bowling
+export class Bowling extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
-        
-        this.references = references
+        super(references)
 
         // Debug
         if(this.game.debug.active)
@@ -32,6 +30,7 @@ export class Bowling
         this.setScreen()
         this.setBumpers()
         this.setJukebox()
+        this.setAchievement()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -459,6 +458,14 @@ export class Bowling
             this.game.debug.addThreeColorBinding(debugPanel, notesColor.value, 'notesColor')
             debugPanel.addBinding(notesStrength, 'value', { label: 'notesStrength', min: 0, max: 10, step: 0.001 })
         }
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('bowlingEnter', 1)
+        })
     }
 
     update()

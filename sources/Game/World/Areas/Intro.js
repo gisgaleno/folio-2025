@@ -1,15 +1,15 @@
-import { Game } from '../Game.js'
-import { InteractivePoints } from '../InteractivePoints.js'
+import { Game } from '../../Game.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import { Area } from './Area.js'
 
-export class Intro
+export class Intro extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
         
-        this.references = references
-
         this.setInteractivePoint()
+        this.setAchievement()
     }
 
     setInteractivePoint()
@@ -42,6 +42,14 @@ export class Intro
         this.game.modals.items.get('intro').events.on('close', () =>
         {
             this.interactivePoint.reveal()
+        })
+    }
+
+    setAchievement()
+    {
+        this.events.on('leave', () =>
+        {
+            this.game.achievements.setProgress('introLeave', 1)
         })
     }
 }

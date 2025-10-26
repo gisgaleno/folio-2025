@@ -1,14 +1,15 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { PortalSlabsGeometry } from '../Geometries/PortalSlabsGeometry.js'
+import { Game } from '../../Game.js'
+import { PortalSlabsGeometry } from '../../Geometries/PortalSlabsGeometry.js'
 import { attribute, color, float, Fn, mix, PI, PI2, positionGeometry, screenCoordinate, sin, texture, uniform, varying, vec2, vec3, vec4, viewportCoordinate } from 'three/tsl'
-import { InteractivePoints } from '../InteractivePoints.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
+import { Area } from './Area.js'
 
-export class BehindTheScene
+export class BehindTheScene extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
         // Debug
         if(this.game.debug.active)
@@ -19,11 +20,11 @@ export class BehindTheScene
             })
         }
 
-        this.references = references
         this.center = this.references.get('center')[0].position
 
         this.setSlabs()
         this.setInteractivePoint()
+        this.setAchievement()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -133,6 +134,14 @@ export class BehindTheScene
         this.game.modals.items.get('behindTheScene').events.on('close', () =>
         {
             this.interactivePoint.reveal()
+        })
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('behindTheSceneEnter', 1)
         })
     }
 

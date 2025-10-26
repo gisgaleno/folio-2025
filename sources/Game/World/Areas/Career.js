@@ -1,16 +1,15 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
+import { Game } from '../../Game.js'
 import { color, float, Fn, luminance, max, mix, positionGeometry, step, texture, uniform, uv, vec4 } from 'three/tsl'
 import gsap from 'gsap'
 import { clamp } from 'three/src/math/MathUtils.js'
+import { Area } from './Area.js'
 
-export class Career
+export class Career extends Area
 {
     constructor(references)
     {
-        this.game = Game.getInstance()
-
-        this.references = references
+        super(references)
 
         // Debug
         if(this.game.debug.active)
@@ -23,6 +22,7 @@ export class Career
 
         this.setLines()
         this.setYears()
+        this.setAchievement()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -223,6 +223,14 @@ export class Career
         // mesh.position.z = -30
         // mesh.position.x = -10
         // this.game.scene.add(mesh)
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('careerEnter', 1)
+        })
     }
 
     update()

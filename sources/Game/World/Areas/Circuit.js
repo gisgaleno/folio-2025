@@ -1,13 +1,14 @@
 import * as THREE from 'three/webgpu'
-import { Game } from '../Game.js'
-import { lerp, segmentCircleIntersection } from '../utilities/maths.js'
-import { InteractivePoints } from '../InteractivePoints.js'
+import { Game } from '../../Game.js'
+import { lerp, segmentCircleIntersection } from '../../utilities/maths.js'
+import { InteractivePoints } from '../../InteractivePoints.js'
 import gsap from 'gsap'
-import { Player } from '../Player.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { Player } from '../../Player.js'
+import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 import { add, color, float, Fn, max, mix, normalGeometry, objectPosition, PI, positionGeometry, positionWorld, rotateUV, sin, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl'
 import { alea } from 'seedrandom'
-import { InputFlag } from '../InputFlag.js'
+import { InputFlag } from '../../InputFlag.js'
+import { Area } from './Area.js'
 
 const rng = new alea('circuit')
 
@@ -41,7 +42,7 @@ function timeToReadableString(time)
     return parts.join(' ')
 }
 
-export default class Circuit
+export default class Circuit extends Area
 {
     static STATE_PENDING = 1
     static STATE_STARTING = 2
@@ -50,7 +51,7 @@ export default class Circuit
 
     constructor(references)
     {
-        this.game = Game.getInstance()
+        super(references)
 
         // Debug
         if(this.game.debug.active)
@@ -61,7 +62,6 @@ export default class Circuit
             })
         }
 
-        this.references = references
         this.state = Circuit.STATE_PENDING
 
         this.setStartPosition()
@@ -84,6 +84,7 @@ export default class Circuit
         this.setResetTime()
         this.setPodium()
         this.setData()
+        this.setAchievement()
 
         this.game.materials.getFromName('circuitBrand').map.minFilter = THREE.LinearFilter
         this.game.materials.getFromName('circuitBrand').map.magFilter = THREE.LinearFilter
@@ -1491,6 +1492,14 @@ export default class Circuit
             this.leaderboard.draw(this.game.server.initData.circuitLeaderboard)
             this.modal.updateLeaderboard(this.game.server.initData.circuitLeaderboard)
         }
+    }
+
+    setAchievement()
+    {
+        this.events.on('enter', () =>
+        {
+            this.game.achievements.setProgress('circuitEnter', 1)
+        })
     }
 
     finish(forced = false)
