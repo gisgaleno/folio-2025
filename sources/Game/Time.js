@@ -9,6 +9,8 @@ export class Time
     {
         this.game = Game.getInstance()
 
+        console.log(this.game)
+
         this.defaultScale = 2
         this._scale = this.defaultScale
         this.game.ticker.scale = this.scale

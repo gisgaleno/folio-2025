@@ -191,7 +191,9 @@ export class Physics
                 colliderDescription = colliderDescription.setRestitution(0.15)
                 
             let category = 'object'
-            if(typeof _colliderDescription.category !== 'undefined')
+            if(typeof _physicalDescription.category !== 'undefined')
+                category = _physicalDescription.category
+            else if(typeof _colliderDescription.category !== 'undefined')
                 category = _colliderDescription.category
 
             colliderDescription = colliderDescription.setCollisionGroups(this.categories[category])

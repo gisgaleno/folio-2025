@@ -138,6 +138,10 @@ export class Objects
             if(typeof _model.userData.friction !== 'undefined')
                 _physicalDescription.friction = _model.userData.friction
 
+            // Category
+            if(typeof _model.userData.category !== 'undefined')
+                _physicalDescription.category = _model.userData.category
+
             _model.name = name.replaceAll(cleanUpRegexp, '')
 
             // Colliders
@@ -179,6 +183,9 @@ export class Objects
 
                 if(typeof _child.userData.friction !== 'undefined')
                     collider.friction = _child.userData.friction
+
+                if(typeof _child.userData.category !== 'undefined')
+                    collider.category = _child.userData.category
 
                 // Collider found
                 if(collider.shape)

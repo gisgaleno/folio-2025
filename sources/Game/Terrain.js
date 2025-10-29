@@ -42,7 +42,7 @@ export class Terrain
 
         const context = canvas.getContext('2d')
 
-        const colors = [
+        this.colors = [
             { stop: 0.1, value: '#ffa94e' },
             { stop: 0.3, value: '#5bc2b9' },
             { stop: 0.9, value: '#13375f' },
@@ -51,7 +51,7 @@ export class Terrain
         const update = () =>
         {
             const gradient = context.createLinearGradient(0, 0, 0, height)
-            for(const color of colors)
+            for(const color of this.colors)
                 gradient.addColorStop(color.stop, color.value)
 
             context.fillStyle = gradient
@@ -72,7 +72,7 @@ export class Terrain
         
         if(this.game.debug.active)
         {
-            for(const color of colors)
+            for(const color of this.colors)
             {
                 this.debugPanel.addBinding(color, 'stop', { min: 0, max: 1, step: 0.001 }).on('change', update)
                 this.debugPanel.addBinding(color, 'value', { view: 'color' }).on('change', update)

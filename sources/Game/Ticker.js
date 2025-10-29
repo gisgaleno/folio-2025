@@ -9,6 +9,8 @@ export class Ticker
     {
         this.game = Game.getInstance()
 
+        console.log(this.game)
+
         this.elapsed = 0
         this.delta = 1 / 60
         this.maxDelta = 1 / 30

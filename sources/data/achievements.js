@@ -147,6 +147,12 @@ export default
         1
     ],
     [
+        'waterfall',
+        'Gamer instinct',
+        'What did you expect? A treasure?',
+        1
+    ],
+    [
         'fan',
         'You’re my only fan',
         'Spawn a fan.',

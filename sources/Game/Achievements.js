@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import achievementsData from '../data/achievements.js'
 import { Game } from './Game.js'
 import { timeToReadableString } from './utilities/time.js'
+import { uniform } from 'three/tsl'
 
 export class Achievements
 {
@@ -71,11 +72,16 @@ export class Achievements
     setGlobalProgress()
     {
         this.globalProgress = {}
+        
         this.globalProgress.element = this.modal.instance.element.querySelector('.js-global-progress')
-        this.globalProgress.current = this.globalProgress.element.querySelector('.js-current')
-        this.globalProgress.total = this.globalProgress.element.querySelector('.js-total')
-        this.globalProgress.time = this.globalProgress.element.querySelector('.js-time')
+        this.globalProgress.currentElement = this.globalProgress.element.querySelector('.js-current')
+        this.globalProgress.totalElement = this.globalProgress.element.querySelector('.js-total')
+        this.globalProgress.timeElement = this.globalProgress.element.querySelector('.js-time')
+        
         this.globalProgress.achieved = false
+        this.globalProgress.achievedCount = 0
+        this.globalProgress.totalCount = 0
+        this.globalProgress.ratioUniform = uniform()
 
         const localTimeStart = localStorage.getItem('achievementsTimeStart')
         const localTimeEnd = localStorage.getItem('achievementsTimeEnd')
@@ -85,20 +91,23 @@ export class Achievements
 
         this.globalProgress.update = () =>
         {
-            let achievedCount = 0
-            let totalCount = 0
+            this.globalProgress.achievedCount = 0
+            this.globalProgress.totalCount = 0
             this.groups.forEach(_group =>
             {
                 for(const achievement of _group.items)
-                    achievedCount += achievement.achieved ? 1 : 0
-
-                totalCount++
+                {
+                    this.globalProgress.achievedCount += achievement.achieved ? 1 : 0
+                    this.globalProgress.totalCount++
+                }
             })
+
+            this.globalProgress.ratioUniform.value = this.globalProgress.achievedCount / this.globalProgress.totalCount
             
-            this.globalProgress.total.textContent = totalCount
-            this.globalProgress.current.textContent = achievedCount
+            this.globalProgress.totalElement.textContent = this.globalProgress.totalCount
+            this.globalProgress.currentElement.textContent = this.globalProgress.achievedCount
             
-            if(achievedCount === totalCount)
+            if(this.globalProgress.achievedCount === this.globalProgress.totalCount)
             {
                 // Achieve
                 if(!this.globalProgress.achieved)
@@ -110,7 +119,7 @@ export class Achievements
                         localStorage.setItem('achievementsTimeEnd', this.globalProgress.timeEnd)
                     }
 
-                    this.globalProgress.time.textContent = timeToReadableString(this.globalProgress.timeEnd - this.globalProgress.timeStart)
+                    this.globalProgress.timeElement.textContent = timeToReadableString(this.globalProgress.timeEnd - this.globalProgress.timeStart)
 
                     this.globalProgress.achieved = true
                     this.globalProgress.element.classList.add('is-achieved')
@@ -123,7 +132,7 @@ export class Achievements
         {
             this.globalProgress.achieved = false
 
-            this.globalProgress.current.textContent = 0
+            this.globalProgress.currentElement.textContent = 0
 
             this.globalProgress.timeStart = this.game.player.timePlayed
             this.globalProgress.timeEnd = 0

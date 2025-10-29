@@ -58,7 +58,7 @@ export class Zones
                 playerPosition = new THREE.Vector2(playerPosition.x, playerPosition.z)
                 zonePosition = new THREE.Vector2(zonePosition.x, zonePosition.z)
             }
-            const distance = this.game.player.position.distanceTo(zone.position)
+            const distance = playerPosition.distanceTo(zonePosition)
 
             if(distance < zone.radius)
             {
