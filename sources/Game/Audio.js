@@ -27,7 +27,7 @@ export class Audio
 
         this.setPlaylist()
         this.setAmbiants()
-        this.setPunctuals()
+        this.setOneOffs()
 
         // Play all autoplays that didn't start because not initated
         this.groups.forEach((group, name) =>
@@ -421,168 +421,6 @@ export class Audio
             }
         )
 
-        // Floor
-        this.register(
-            'floor',
-            {
-                path: 'sounds/floor/Source Stone Loop Small Rubbing Pebbles On Rubber 01.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    const defaultElevation = 1.08
-                    const elevationEffect = remapClamp(Math.abs(this.game.physicalVehicle.position.y - defaultElevation), 0, 2, 1, 0)
-                    const speedEffect = Math.min(1, this.game.physicalVehicle.xzSpeed * 0.1)
-                    // console.log(speedEffect)
-                    item.volume = elevationEffect * speedEffect * 0.15
-                    item.rate = 1.15
-                }
-            }
-        )
-
-        // Floor
-        this.register(
-            'floor',
-            {
-                path: 'sounds/floor/Source Stone Loop Small Rubbing Pebbles On Concrete 02.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    const directionRatio = (1 - Math.abs(this.game.physicalVehicle.forwardRatio)) * 0.6
-                    
-                    let brakeEffect = Math.max(directionRatio, this.game.player.braking) * this.game.physicalVehicle.xzSpeed * 0.15 * this.game.physicalVehicle.wheels.inContactCount / 4
-                    brakeEffect = clamp(brakeEffect, 0, 1)
-
-                    const volume = brakeEffect * 0.4
-                    const delta = volume - item.volume
-
-                    if(delta > 0)
-                        item.volume += delta * this.game.ticker.deltaScaled * 20
-                    else
-                        item.volume += delta * this.game.ticker.deltaScaled * 5
-                    
-                    item.rate = 0.8
-                }
-            }
-        )
-
-        // Floor
-        this.register(
-            'floor',
-            {
-                path: 'sounds/floor/Earth Loop Dumping Gravel Sack Bulk Falling 01.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    item.volume = this.groups.get('floor').items[0].volume * 0.5
-                    
-                    item.rate = 1.2
-                }
-            }
-        )
-
-        // Engine
-        this.register(
-            'engine',
-            {
-                path: 'sounds/engine/muscle car engine loop idle.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    const accelerating = Math.abs(this.game.player.accelerating) * 0.5
-                    const boosting = this.game.player.boosting + 1
-                    const volume = Math.max(0.05, accelerating * boosting * 0.8)
-                    const delta = volume - item.volume
-                    const easing = delta > 0 ? 10 : 2.5
-                    
-                    item.volume += delta * this.game.ticker.deltaScaled * easing
-
-                    const rate = remapClamp(accelerating * boosting, 0, 1, 0.6, 1.1)
-                    item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
-                }
-            }
-        )
-
-        // Spin
-        this.register(
-            'spin',
-            {
-                path: 'sounds/spin/41051 Glass stone turning loop 09-full.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    // const accelerating = Math.abs(this.game.player.accelerating) * 0.5
-                    // const boosting = this.game.player.boosting + 1
-                    // const volume = accelerating * boosting * 0.8
-                    // const accelerating = Math.abs(this.game.player.accelerating) * 0.5
-                    // const boosting = this.game.player.boosting + 1
-                    const speedEffect = clamp(this.game.physicalVehicle.xzSpeed * 0.1, 0, 1)
-                    const volume = speedEffect * 0.3
-                    const delta = volume - item.volume
-                    const easing = delta > 0 ? 10 : 2.5
-                    
-                    item.volume += delta * this.game.ticker.deltaScaled * easing
-
-                    const rate = remapClamp(speedEffect, 0, 1, 1, 2)
-                    item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
-                }
-            }
-        )
-
-        // Energy
-        this.register(
-            'energy',
-            {
-                path: 'sounds/energy/Energy_-_force_field_8_loop.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    const accelerating = 0.5 + Math.abs(this.game.player.accelerating) * 0.5
-                    const boosting = this.game.player.boosting
-                    const volume = accelerating * boosting * 0.3
-                    const delta = volume - item.volume
-                    const easing = delta > 0 ? 10 : 1
-                    
-                    item.volume += delta * this.game.ticker.deltaScaled * easing
-
-                    const rate = 0.95 + Math.abs(this.game.player.accelerating) * 0.3
-                    item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
-                }
-            }
-        )
-
-        // Energy
-        this.register(
-            'energy',
-            {
-                path: 'sounds/energy/Energy_-_force_field_6_loop.mp3',
-                autoplay: true,
-                loop: true,
-                volume: 0,
-                onPlaying: (item) =>
-                {
-                    const accelerating = 0.5 + Math.abs(this.game.player.accelerating) * 0.5
-                    const boosting = this.game.player.boosting
-                    const volume = accelerating * boosting * 0.2
-                    const delta = volume - item.volume
-                    const easing = delta > 0 ? 10 : 2.5
-                    
-                    item.volume += delta * this.game.ticker.deltaScaled * easing
-                }
-            }
-        )
-
         // Oven fire (Project Area + Cookie Area)
         {
             const positions = []
@@ -630,7 +468,7 @@ export class Audio
         }
     }
 
-    setPunctuals()
+    setOneOffs()
     {
         this.register(
             'slide',
@@ -759,19 +597,6 @@ export class Audio
             }
         }
     }
-
-    // playRandomNextFromGroup(groupName)
-    // {
-    //     const group = this.groups.get(groupName)
-
-    //     if(!group)
-    //         return false
-
-    //     const delta = 1 + Math.floor(Math.random() * (group.length - 2))
-    //     id += delta
-    //     id = id % (group.length - 1)
-    //     group[id].play(force)
-    // }
 
     setMuteToggle()
     {
