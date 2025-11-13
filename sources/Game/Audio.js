@@ -681,7 +681,10 @@ export class Audio
                 item.howl.rate(item.rate * this.globalRate)
 
                 // Volume
+                const volume = item.volume * distanceFadeMultiplier
                 item.howl.volume(item.volume * distanceFadeMultiplier)
+
+                item.howl.mute(volume < 0.01)
             }
         })
     }
