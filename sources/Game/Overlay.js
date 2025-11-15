@@ -9,6 +9,8 @@ export class Overlay
     {
         this.game = Game.getInstance()
 
+        this.setSounds()
+
         // Uniforms
         const colorA = uniform(color('#251f2b'))
         const colorB = uniform(color('#1d1721'))
@@ -91,10 +93,30 @@ export class Overlay
         })
     }
 
+    setSounds()
+    {
+        this.sounds = {}
+
+        this.sounds.show = this.game.audio.register({
+            path: 'sounds/swoosh/Swoosh 02.mp3',
+            autoplay: false,
+            loop: false,
+            volume: 0.25
+        })
+
+        this.sounds.hide = this.game.audio.register({
+            path: 'sounds/swoosh/Swoosh 05.mp3',
+            autoplay: false,
+            loop: false,
+            volume: 0.25
+        })
+    }
+
     show(callback)
     {
         this.inverted.value = 0
         this.mesh.visible = true
+        this.sounds.show.play()
         gsap.to(this.progress, { value: 1, ease: 'power1.inOut', overwrite: true, duration: 2, onComplete: () =>
         {
             if(typeof callback === 'function')
@@ -105,6 +127,7 @@ export class Overlay
     hide(callback)
     {
         this.inverted.value = 1
+        this.sounds.hide.play()
         gsap.to(this.progress, { value: 0, ease: 'power1.inOut', overwrite: true, duration: 4, onComplete: () =>
         {
             this.mesh.visible = false

@@ -103,18 +103,6 @@ export class Player
                 item.rate = 0.9 + Math.random() * 0.4
             }
         })
-        this.sounds.respawn = this.game.audio.register({
-            path: 'sounds/swoosh/Swoosh 02.mp3',
-            autoplay: false,
-            loop: false,
-            volume: 0.25
-        })
-        this.sounds.respawnReverse = this.game.audio.register({
-            path: 'sounds/swoosh/Swoosh 05.mp3',
-            autoplay: false,
-            loop: false,
-            volume: 0.25
-        })
 
         // Wheels on floor
         {
@@ -453,19 +441,10 @@ export class Player
 
     respawn(respawnName = null, callback = null)
     {
-        // gsap.delayedCall(0.2, () =>
-        // {
-            this.sounds.respawn.play()
-        // })
         this.game.overlay.show(() =>
         {
             if(typeof callback === 'function')
                 callback()
-            
-            // gsap.delayedCall(0.8, () =>
-            // {
-                this.sounds.respawnReverse.play()
-            // })
 
             // Find respawn
             let respawn = respawnName ? this.game.respawns.getByName(respawnName) : this.game.respawns.getClosest(this.position)
