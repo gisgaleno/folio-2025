@@ -58,7 +58,7 @@ export class LandingArea extends Area
 
         this.game.modals.items.get('intro').events.on('close', () =>
         {
-            this.interactivePoint.reveal()
+            this.interactivePoint.show()
         })
     }
 

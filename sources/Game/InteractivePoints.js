@@ -134,11 +134,15 @@ export class InteractivePoints
         group.scale.setScalar(0.85)
         this.game.scene.add(group)
 
+        // Materials
+        const materials = []
+
         /**
          * Diamond
          */
         // Material
-        const diamondMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
+        const diamondMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true })
+        materials.push(diamondMaterial)
 
         const threshold = uniform(0)
         const lineThickness = uniform(0.150)
@@ -178,7 +182,8 @@ export class InteractivePoints
          * Key
          */
         // Material
-        const keyMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
+        const keyMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true })
+        materials.push(keyMaterial)
 
         const keyOutput = Fn(([keyTexture]) =>
         {
@@ -285,7 +290,8 @@ export class InteractivePoints
         labelTexture.needsUpdate = true
 
         // Material
-        const labelMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
+        const labelMaterial = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true })
+        materials.push(labelMaterial)
 
         const labelOffset = uniform(1)
         labelMaterial.outputNode = Fn(() =>
@@ -334,6 +340,8 @@ export class InteractivePoints
         item.concealCallback = concealCallback
         item.hideCallback = hideCallback
         item.isIn = false
+        item.state = InteractivePoints.STATE_HIDDEN
+        item.materials = materials
         this.items.push(item)
 
         /**
@@ -415,6 +423,13 @@ export class InteractivePoints
 
             gsap.to(labelOffset, { value: 0, ease: 'power2.out', duration: 0.6, delay: 0.2, overwrite: true })
 
+            // Materials
+            for(const material of item.materials)
+            {
+                material.depthTest = false
+                material.needsUpdate = true
+            }
+
             // Reveal
             this.sounds.reveal.play()
 
@@ -446,6 +461,13 @@ export class InteractivePoints
             gsap.to(key.scale, { x: 0, y: 0, z: 0, ease: 'power2.in', duration: 0.6, overwrite: true })
 
             gsap.to(labelOffset, { value: align === InteractivePoints.ALIGN_LEFT ? - 1 : 1, ease: 'power2.in', duration: 0.6, overwrite: true })
+            
+            // Materials
+            for(const material of item.materials)
+            {
+                material.depthTest = true
+                material.needsUpdate = true
+            }
 
             // Reveal
             this.sounds.conceal.play()
