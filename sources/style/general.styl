@@ -37,6 +37,13 @@ body
 .experience
     touch-action none
 
+    .input-filter-wandering &,
+    .input-filter-intro &
+        cursor grab
+
+        &:active
+            cursor grabbing
+
 html
     background radial-gradient(farthest-side at 0 0, #251f2b, #1d1721)
     font-size 20px

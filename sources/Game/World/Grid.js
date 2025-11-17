@@ -50,7 +50,7 @@ export class Grid
         
         uvGridMaterial.outputNode = Fn(() =>
         {
-            const distanceToCenter = positionWorld.xz.sub(this.game.reveal.center).length()
+            const distanceToCenter = positionWorld.xz.sub(this.game.reveal.position2Uniform).length()
             distanceToCenter.lessThan(this.game.reveal.distance).discard()
 
             return defaultMaterial.outputNode

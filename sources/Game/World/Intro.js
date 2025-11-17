@@ -14,6 +14,7 @@ export class Intro
         this.center = respawn.position.clone()
 
         this.setCircle()
+        this.setLabel()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -21,17 +22,29 @@ export class Intro
         })
     }
 
+    setLabel()
+    {
+        this.label = new THREE.Group()
+        this.label.position.copy(this.center)
+        this.label.position.x += 3.5
+        this.label.position.z -= 1
+        this.label.position.y = 3.3
+        this.label.rotation.y = 0.4
+        this.label.scale.setScalar(0.01)
+        this.game.scene.add(this.label)
+    }
+
     setCircle()
     {
         this.circle = {}
         
         const radius = 3.5
-        const thickness = 0.05
+        const thickness = 0.04
         this.circle.progress = 0
         this.circle.smoothedProgress = uniform(0)
 
         // Geometry
-        const geometry = new THREE.RingGeometry(radius - thickness, radius, 64, 1)
+        const geometry = new THREE.RingGeometry(radius - thickness, radius, 128, 1)
 
         // Material
         const material = new THREE.MeshBasicNodeMaterial()
@@ -86,7 +99,7 @@ export class Intro
         }
     }
 
-    setLabel()
+    setText()
     {
         // Geometry
         const scale = 1.3
@@ -154,36 +167,88 @@ export class Intro
 
         const mesh = new THREE.Mesh(geometry, material)
         mesh.visible = false
-        mesh.position.copy(this.center)
-        mesh.position.x += 3.5
-        mesh.position.z -= 1
-        mesh.position.y = 3.3
-        mesh.rotation.y = 0.4
 
-        mesh.scale.setScalar(0.01)
-        this.game.scene.add(mesh)
+        this.label.add(mesh)
 
-        this.game.ticker.wait(1, () =>
-        {
-            const dummy = { scale: 0 }
-            const speedMultiplier = this.game.debug.active ? 4 : 1
-            gsap.to(
-                dummy,
-                {
-                    scale: 1,
-                    duration: 2 / speedMultiplier,
-                    delay: 1 / speedMultiplier,
-                    ease: 'elastic.out(0.5)',
-                    overwrite: true,
-                    onUpdate: () =>
-                    {
-                        mesh.scale.setScalar(dummy.scale)
-                    }
-                }
-            )
+        this.text = mesh
+    }
+
+    setSoundButton()
+    {
+        this.soundButton = {}
+
+        // Texture
+        const texture = this.game.resources.soundTexture
+        
+        if(this.game.audio.muteToggle.active)
+            texture.offset.x = 0.5
+
+        // Geometry
+        const scale = 0.5
+        const geometry = new THREE.PlaneGeometry(50 / 38 * scale, 1 * scale)
+
+        // Material
+        const intensity = uniform(1)
+        const material = new THREE.MeshBasicNodeMaterial({
+            alphaTest: 0.5,
+            alphaMap: texture,
+            transparent: true,
+            outputNode: vec4(vec3(1).mul(intensity), 1)
         })
 
-        this.label = mesh
+        // Mesh
+        const mesh = new THREE.Mesh(geometry, material)
+        mesh.position.x = 0.38
+        mesh.position.y = - 1
+        this.label.add(mesh)
+
+        // Intersect
+        const position = this.label.position.clone()
+        position.x += 0.38
+        position.y += - 1
+
+        this.soundButton.intersect = this.game.rayCursor.addIntersects({
+            active: true,
+            shapes:
+            [
+                new THREE.Sphere(position, 0.5)
+            ],
+            onClick: () =>
+            {
+                this.game.audio.muteToggle.toggle()
+                texture.offset.x = this.game.audio.muteToggle.active ? 0.5 : 0
+            },
+            onEnter: () =>
+            {
+                gsap.to(intensity, { value: 1.5, duration: 0.3, overwrite: true })
+            },
+            onLeave: () =>
+            {
+                gsap.to(intensity, { value: 1, duration: 0.3, overwrite: true })
+            }
+        })
+
+        this.soundButton.mesh = mesh
+    }
+
+    showLabel()
+    {
+        const dummy = { scale: 0 }
+        const speedMultiplier = this.game.debug.active ? 4 : 1
+        gsap.to(
+            dummy,
+            {
+                scale: 1,
+                duration: 2 / speedMultiplier,
+                delay: 1 / speedMultiplier,
+                ease: 'elastic.out(0.5)',
+                overwrite: true,
+                onUpdate: () =>
+                {
+                    this.label.scale.setScalar(dummy.scale)
+                }
+            }
+        )
     }
 
     hideLabel()
@@ -203,7 +268,9 @@ export class Intro
                 },
                 onComplete: () =>
                 {
-                    this.label.removeFromParent()
+                    this.text.removeFromParent()
+                    this.soundButton.mesh.removeFromParent()
+                    this.game.rayCursor.removeIntersect(this.soundButton.intersect)
                 }
             }
         )

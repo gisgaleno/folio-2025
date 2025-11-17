@@ -1396,12 +1396,10 @@ export class LabArea extends Area
             this.interactivePoint.reveal()
         })
 
-        // // Cursor
-        // this.adjacents.next.intersect.active = false
-        // this.adjacents.previous.intersect.active = false
-        // this.pagination.previousIntersect.active = false
-        // this.pagination.nextIntersect.active = false
-        // this.url.intersect.active = false
+        // Cursor
+        this.adjacents.nextIntersect.active = false
+        this.adjacents.previousIntersect.active = false
+        this.url.intersect.active = false
 
         // Activate physical vehicle
         this.game.physicalVehicle.activate()

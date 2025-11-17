@@ -187,7 +187,7 @@ export class VisualVehicle
             material.outputNode = Fn(() =>
             {
                 const starsUv = screenCoordinate.div(256).fract()
-                const starsColor = texture(this.game.resources.behindTheSceneStars, starsUv).rgb.pow(2).mul(starsIntensity)
+                const starsColor = texture(this.game.resources.behindTheSceneStarsTexture, starsUv).rgb.pow(2).mul(starsIntensity)
 				
                 const viewDirection = positionWorld.sub( cameraPosition ).normalize();
                 const fresnel = viewDirection.dot(normalWorld).remapClamp(-0.2, -0.4, 1, 0)

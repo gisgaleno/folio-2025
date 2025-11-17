@@ -97,7 +97,7 @@ export class BehindTheSceneArea extends Area
             const strength = edge.toVar().sub(0.5).abs().mul(2).add(edgeOffset).step(edgeTreshold)
             
             const starsUv = screenCoordinate.div(256).fract().add(this.starsOffset)
-            const starsColor = texture(this.game.resources.behindTheSceneStars, starsUv).rgb.pow(2).mul(5)
+            const starsColor = texture(this.game.resources.behindTheSceneStarsTexture, starsUv).rgb.pow(2).mul(5)
             
             const bloomColor = this.bloomColor.mul(this.bloomIntensity)
             const finalColor = mix(starsColor, bloomColor, strength)

@@ -10,11 +10,13 @@ export class Reveal
         this.game = Game.getInstance()
         
         const respawn = this.game.respawns.getDefault()
-        this.center = uniform(vec2(respawn.position.x, respawn.position.z))
+        this.position = respawn.position.clone()
+        this.position2Uniform = uniform(vec2(this.position.x, this.position.z))
         this.distance = uniform(0)
         this.thickness = uniform(0.05)
         this.color = uniform(color('#e88eff'))
-        this.intensity = uniform(6.5)
+        this.intensity = uniform(5.5)
+        this.intensityMultiplier = 1
         this.sound = this.game.audio.register({
             path: 'sounds/reveal/reveal-1.mp3',
             autoplay: false,
@@ -83,8 +85,13 @@ export class Reveal
                     }
                 )
 
-                // Intro loader => Show label
-                this.game.world.intro.setLabel()
+                // Intro loader => Show label and sound button
+                this.game.world.intro.setText()
+                this.game.world.intro.setSoundButton()
+                this.game.ticker.wait(1, () =>
+                {
+                    this.game.world.intro.showLabel()
+                })
 
                 // Cherry trees
                 if(this.game.world.cherryTrees)
@@ -97,57 +104,52 @@ export class Reveal
                 }
                 else
                 {
-                    this.game.canvasElement.style.cursor = 'pointer'
+                    // Next function
+                    const next = () =>
+                    {
+                        this.step(1)
+                        this.game.inputs.events.off('introStart', inputCallback)
+                        this.game.rayCursor.removeIntersect(intersect)
+                    }
 
+                    // Input callback
+                    const inputCallback = () =>
+                    {
+                        next()
+                    }
+
+                    // Intsect
+                    const position = this.position.clone()
+                    position.y = 0
+                    
+                    const intersect = this.game.rayCursor.addIntersects({
+                        active: true,
+                        shapes:
+                        [
+                            new THREE.Sphere(position, 3.5)
+                        ],
+                        onClick: next,
+                        onEnter: () =>
+                        {
+                            gsap.to(this, { intensityMultiplier: 1.22, duration: 0.2, overwrite: true })
+                        },
+                        onLeave: () =>
+                        {
+                            gsap.to(this, { intensityMultiplier: 1, duration: 0.2, overwrite: true })
+                        }
+                    })
+                    
+                    // Inputs (for gamepad and keyboard)
                     this.game.inputs.addActions([
-                        { name: 'introStart', categories: [ 'intro' ], keys: [ 'Pointer.any', 'Gamepad.cross', 'Keyboard.Enter' ] },
+                        { name: 'introStart', categories: [ 'intro' ], keys: [ 'Gamepad.cross', 'Keyboard.Enter' ] },
                     ])
 
-                    const deltaCursor = { x: 0, y: 0 }
-
-                    const callback = (action) =>
-                    {
-                        if(typeof action.value === 'object' && typeof action.value.x !== 'undefined')
-                        {
-                            // End
-                            if(action.trigger === 'start')
-                            {
-                                deltaCursor.x = 0
-                                deltaCursor.y = 0
-                            }
-                            else if(action.trigger === 'change')
-                            {
-                                if(this.game.inputs.pointer.isDown)
-                                {
-                                    deltaCursor.x += Math.abs(this.game.inputs.pointer.delta.x)
-                                    deltaCursor.y += Math.abs(this.game.inputs.pointer.delta.y)
-                                }
-                            }
-                            if(action.trigger === 'end')
-                            {
-                                const distance = Math.hypot(deltaCursor.x, deltaCursor.y)
-                                
-                                if(distance < 25)
-                                {
-                                    this.step(1)
-                                    this.game.inputs.events.off('introStart', callback)
-                                }
-                            }
-                        }
-                        else
-                        {
-                            this.step(1)
-                            this.game.inputs.events.off('introStart', callback)
-                        }
-                    }
-                    this.game.inputs.events.on('introStart', callback)
+                    this.game.inputs.events.on('introStart', inputCallback)
                 }
             })
         }
         else if(step = 1)
         {
-            this.game.canvasElement.style.cursor = 'default'
-                
             // Audio
             this.game.audio.init()
             this.sound.play()
@@ -214,6 +216,6 @@ export class Reveal
     update()
     {
         this.color.value.copy(this.game.dayCycles.properties.revealColor.value)
-        this.intensity.value = this.game.dayCycles.properties.revealIntensity.value
+        this.intensity.value = this.game.dayCycles.properties.revealIntensity.value * this.intensityMultiplier
     }
 }

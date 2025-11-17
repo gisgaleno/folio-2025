@@ -69,8 +69,9 @@ export class Game
         // First batch for intro
         this.resourcesLoader = new ResourcesLoader()
         this.resources = await this.resourcesLoader.load([
-            [ 'respawnsReferencesModel', 'respawns/respawnsReferences.glb', 'gltf' ],
-            [ 'behindTheSceneStars',     'behindTheScene/stars.png',        'texture', (resource) => { resource.colorSpace = THREE.SRGBColorSpace; resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; resource.wrapS = THREE.RepeatWrapping; resource.wrapT = THREE.RepeatWrapping; } ],
+            [ 'respawnsReferencesModel',    'respawns/respawnsReferences.glb', 'gltf' ],
+            [ 'behindTheSceneStarsTexture', 'behindTheScene/stars.png',        'texture', (resource) => { resource.colorSpace = THREE.SRGBColorSpace; resource.minFilter = THREE.NearestFilter; resource.magFilter = THREE.NearestFilter; resource.generateMipmaps = false; resource.wrapS = THREE.RepeatWrapping; resource.wrapT = THREE.RepeatWrapping; } ],
+            [ 'soundTexture',               'intro/sound.png',                 'texture', (resource) => { resource.minFilter = THREE.LinearFilter; resource.magFilter = THREE.LinearFilter; resource.generateMipmaps = false; resource.repeat.x = 0.5; } ],
         ])
         this.scene = new THREE.Scene()
         this.debug = new Debug()

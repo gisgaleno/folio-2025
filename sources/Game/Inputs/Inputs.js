@@ -6,6 +6,7 @@ import Keyboard from './Keyboard.js'
 import { InteractiveButtons } from './InteractiveButtons.js'
 import { Wheel } from './Wheel.js'
 import { Nipple } from './Nipple.js'
+import ObservableSet from '../utilities/ObservableSet.js'
 
 export class Inputs
 {
@@ -19,7 +20,24 @@ export class Inputs
         this.events = new Events()
 
         this.actions = new Map()
-        this.filters = new Set()
+        this.filters = new ObservableSet((event) =>
+        {
+            if(event.type === 'add')
+            {
+                document.documentElement.classList.add(`input-filter-${event.value}`)
+            }
+            else if(event.type === 'delete')
+            {
+                document.documentElement.classList.remove(`input-filter-${event.value}`)
+            }
+            else if(event.type === 'clear')
+            {
+                for(const previousValue of event.previousValues)
+                {
+                    document.documentElement.classList.remove(`input-filter-${previousValue}`)
+                }
+            }
+        })
         this.mode = Inputs.MODE_MOUSEKEYBOARD
 
         this.setKeyboard()

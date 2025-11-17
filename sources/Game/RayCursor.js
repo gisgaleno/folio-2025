@@ -32,17 +32,27 @@ export class RayCursor
         return intersect
     }
 
+    removeIntersect(intersect)
+    {
+        this.intersects = this.intersects.filter(_intersect => _intersect !== intersect)
+    }
+
     setPointerTesting()
     {
         this.game.inputs.addActions([
-            { name: 'rayPointer', categories: [ 'wandering', 'racing', 'cinematic' ], keys: [ 'Pointer.any' ] },
+            { name: 'rayPointer', categories: [ 'intro', 'wandering', 'racing', 'cinematic' ], keys: [ 'Pointer.any' ] },
         ])
+
+        const deltaCursor = { x: 0, y: 0 }
 
         this.game.inputs.events.on('rayPointer', (action) =>
         {
             // Start
             if(action.trigger === 'start')
             {
+                deltaCursor.x = 0
+                deltaCursor.y = 0
+
                 if(this.currentIntersect)
                 {
                     this.currentIntersect.isDown = true
@@ -57,6 +67,8 @@ export class RayCursor
             {
                 const intersects = this.intersects.filter(intersect => intersect.active)
 
+                const distance = Math.hypot(deltaCursor.x, deltaCursor.y)
+                
                 // Each intersect
                 for(const intersect of intersects)
                 {
@@ -71,7 +83,7 @@ export class RayCursor
                         {
                             intersect.isDown = false
 
-                            if(typeof intersect.onClick === 'function')
+                            if(typeof intersect.onClick === 'function' && distance < 25)
                                 intersect.onClick()
                         }
                     }
@@ -93,6 +105,9 @@ export class RayCursor
             {
                 const intersects = this.intersects.filter(intersect => intersect.active)
                 let isAnyIntersecting = false
+
+                deltaCursor.x += Math.abs(this.game.inputs.pointer.delta.x)
+                deltaCursor.y += Math.abs(this.game.inputs.pointer.delta.y)
 
                 if(intersects.length)
                 {
@@ -157,7 +172,10 @@ export class RayCursor
                     {
                         this.isAnyIntersecting = isAnyIntersecting
                         
-                        this.game.canvasElement.style.cursor = this.isAnyIntersecting ? 'pointer' : 'default'
+                        if(this.isAnyIntersecting)
+                            this.game.canvasElement.style.cursor = 'pointer'
+                        else
+                            this.game.canvasElement.style.cursor = null
                     }
 
                     if(!isAnyIntersecting)
