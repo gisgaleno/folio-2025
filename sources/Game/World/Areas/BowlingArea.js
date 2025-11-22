@@ -106,7 +106,7 @@ export class BowlingArea extends Area
             pin.group = reference
 
             // Object with physics linked to reference
-            const object = this.game.objects.add(
+            pin.object = this.game.objects.add(
                 {
                     model: reference,
                     updateMaterials: false,
@@ -132,7 +132,7 @@ export class BowlingArea extends Area
                 },
             )
 
-            pin.body = object.physical.body
+            pin.body = pin.object.physical.body
             pin.basePosition = pin.group.position.clone()
             pin.baseRotation = pin.group.quaternion.clone()
 
@@ -157,7 +157,7 @@ export class BowlingArea extends Area
         // )
         // basePin.removeFromParent()
 
-        this.instancedGroup = new InstancedGroup(references, basePin, true)
+        this.instancedGroup = new InstancedGroup(references, basePin)
 
         // Reset
         this.pins.reset = () =>
@@ -591,6 +591,9 @@ export class BowlingArea extends Area
                 if(!pin.isSleeping)
                     showRestartInteractivePoint = true
             }
+
+            if(!isSleeping)
+                pin.object.visual.object3D.needsUpdate = true
         }
 
         // Pins > Texture update if needed and won event

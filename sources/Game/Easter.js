@@ -123,7 +123,7 @@ export class Easter
         }
 
         // Instanced group
-        this.testInstancedGroup = new InstancedGroup(references, this.visual, true)
+        this.testInstancedGroup = new InstancedGroup(references, this.visual)
 
         this.eggs.getClosest = () =>
         {

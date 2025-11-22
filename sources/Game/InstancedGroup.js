@@ -3,7 +3,7 @@ import { Game } from './Game.js'
 
 export class InstancedGroup
 {
-    constructor(references = [], group = null, autoUpdate = false)
+    constructor(references = [], group = null, autoUpdate = true)
     {
         this.game = Game.getInstance()
 
@@ -61,6 +61,7 @@ export class InstancedGroup
             reference.position.copy(child.position)
             reference.rotation.copy(child.rotation)
             reference.scale.copy(child.scale)
+            reference.needsUpdate = true
             references.push(reference)
         }
         
@@ -89,21 +90,28 @@ export class InstancedGroup
 
     update()
     {
+        let updated = 0
         let i = 0
         for(const _reference of this.references)
         {
-            _reference.updateMatrixWorld()
-
-            for(const instancedMesh of this.meshes)
+            if(_reference.needsUpdate)
             {
-                const finalMatrix = instancedMesh.localMatrix.clone().premultiply(_reference.matrixWorld)
-                instancedMesh.instance.setMatrixAt(i, finalMatrix)
+                updated++
+                _reference.needsUpdate = false
+                _reference.updateMatrixWorld()
+
+                for(const instancedMesh of this.meshes)
+                {
+                    const finalMatrix = instancedMesh.localMatrix.clone().premultiply(_reference.matrixWorld)
+                    instancedMesh.instance.setMatrixAt(i, finalMatrix)
+                }
             }
 
             i++
         }
 
-        for(const instancedMesh of this.meshes)
-            instancedMesh.instance.instanceMatrix.needsUpdate = true
+        if(updated)
+            for(const instancedMesh of this.meshes)
+                instancedMesh.instance.instanceMatrix.needsUpdate = true
     }
 }

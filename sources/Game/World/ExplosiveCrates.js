@@ -21,7 +21,7 @@ export class ExplosiveCrates
         this.game.materials.updateObject(base)
 
         // Create instanced group
-        this.instancedGroup = new InstancedGroup(this.references, base, true)
+        this.instancedGroup = new InstancedGroup(this.references, base)
 
         this.items = []
         
@@ -59,6 +59,12 @@ export class ExplosiveCrates
         }
 
         this.setSounds()
+
+        // Tick update
+        this.game.ticker.events.on('tick', () =>
+        {
+            this.update()
+        }, 10)
     }
 
     setSounds()
@@ -130,6 +136,7 @@ export class ExplosiveCrates
             // Disable
             this.game.objects.disable(crate.object)
             crate.object.visual.object3D.position.y += 100 // Hide the instance reference
+            crate.object.visual.object3D.needsUpdate = true
 
             // Achievements
             this.game.achievements.setProgress('explosiveCrates', crate.id)
@@ -166,6 +173,14 @@ export class ExplosiveCrates
                 })
             }
         })
+    }
 
+    update()
+    {
+        for(const crate of this.items)
+        {
+            if(!crate.object.physical.body.isSleeping() && crate.object.physical.body.isEnabled())
+                crate.object.visual.object3D.needsUpdate = true
+        }
     }
 }

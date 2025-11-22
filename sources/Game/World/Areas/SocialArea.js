@@ -128,7 +128,7 @@ export class SocialArea extends Area
             this.fans.objects.push(object)
         }
 
-        this.fans.instancedGroup = new InstancedGroup(references, baseFan, true)
+        this.fans.instancedGroup = new InstancedGroup(references, baseFan)
 
         this.fans.pop = () =>
         {
@@ -227,6 +227,12 @@ export class SocialArea extends Area
                 this.statue.down = true
                 this.game.achievements.setProgress('statueDown', 1)
             }
+        }
+
+        for(const object of this.fans.objects)
+        {
+            if(!object.physical.body.isSleeping() && object.physical.body.isEnabled())
+                object.visual.object3D.needsUpdate = true
         }
     }
 }

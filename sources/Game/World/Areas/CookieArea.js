@@ -239,7 +239,7 @@ export class CookieArea extends Area
             this.cookies.objects.push(object)
         }
 
-        this.cookies.instancedGroup = new InstancedGroup(references, baseCookie, true)
+        this.cookies.instancedGroup = new InstancedGroup(references, baseCookie)
     }
 
     setActualCookies()
@@ -496,7 +496,6 @@ export class CookieArea extends Area
         this.blower.scale.y = Math.sin(this.game.ticker.elapsedScaled + Math.PI) * 0.25 + 0.75
 
         // Cookies
-
         if(this.cookies.visibleCount)
         {
             let allCookiesSleeping = true
@@ -505,6 +504,12 @@ export class CookieArea extends Area
 
             if(!allCookiesSleeping)
                 this.cookies.instancedGroup.updateBoundings()
+        }
+
+        for(const object of this.cookies.objects)
+        {
+            if(!object.physical.body.isSleeping() && object.physical.body.isEnabled())
+                object.visual.object3D.needsUpdate = true
         }
     }
 }

@@ -19,34 +19,47 @@ export class Benches
         // Update materials 
         this.game.materials.updateObject(base)
 
-        // Physics
+        // Objects
+        this.objects = []
         for(const reference of references)
         {
-            this.game.objects.add(
-                {
-                    model: reference,
-                    updateMaterials: false,
-                    parent: null,
-                },
-                {
-                    type: 'dynamic',
-                    position: reference.position,
-                    rotation: reference.quaternion,
-                    friction: 0.7,
-                    mass: 0.1,
-                    sleeping: true,
-                    colliders: descriptions[1].colliders,
-                    waterGravityMultiplier: - 1,
-                    contactThreshold: 10,
-                    onCollision: (force, position) =>
+            this.objects.push(
+                this.game.objects.add(
                     {
-                        // this.game.audio.groups.get('hitMetal').playRandomNext(force, position)
-                    }
-                },
+                        model: reference,
+                        updateMaterials: false,
+                        parent: null,
+                    },
+                    {
+                        type: 'dynamic',
+                        position: reference.position,
+                        rotation: reference.quaternion,
+                        friction: 0.7,
+                        mass: 0.1,
+                        sleeping: true,
+                        colliders: descriptions[1].colliders,
+                        waterGravityMultiplier: - 1,
+                        contactThreshold: 10,
+                        onCollision: (force, position) =>
+                        {
+                            // this.game.audio.groups.get('hitMetal').playRandomNext(force, position)
+                        }
+                    },
+                )
             )
         }
 
         // Instanced group
-        this.testInstancedGroup = new InstancedGroup(references, base, true)
+        this.testInstancedGroup = new InstancedGroup(references, base)
+
+        // Tick update
+        this.game.ticker.events.on('tick', () =>
+        {
+            for(const object of this.objects)
+            {
+                if(!object.physical.body.isSleeping() && object.physical.body.isEnabled())
+                    object.visual.object3D.needsUpdate = true
+            }
+        }, 10)
     }
 }
