@@ -39,6 +39,9 @@
         min-height 120px
         height 20vh
 
+        @media only screen and (max-width 520px)
+            font-size 48px
+
         button
             display none
             height 80px
@@ -50,6 +53,12 @@
 
             &.is-visible
                 display flex
+
+            &.interact
+            &.unstuck
+                @media only screen and (max-width 520px)
+                    padding-left 3.5vw
+                    padding-right 3.5vw
 
         .previous
             &::after
