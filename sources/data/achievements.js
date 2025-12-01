@@ -55,6 +55,12 @@ export default
         1000
     ],
     [
+        'whisper',
+        'It\'s About Sending A Message',
+        'Post a whisper.',
+        1
+    ],
+    [
         'sea',
         'Under the sea',
         'Go make friend with the fishes.',
@@ -114,12 +120,6 @@ export default
         'Do not disturb',
         'Knock down the latrine.',
         1
-    ],
-    [
-        'speed',
-        'I feel the need — the need for speed!',
-        'Reach <strong>130 km/h</strong>',
-        130
     ],
     [
         'circuitFinish',

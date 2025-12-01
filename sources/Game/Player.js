@@ -647,11 +647,11 @@ export class Player
         if(this.game.achievements.groups.get('goHigh') && elevation > this.game.achievements.groups.get('goHigh').progress)
             this.game.achievements.setProgress('goHigh', elevation)
 
-        // Speed achievement
-        const speedKmPerHour = Math.floor(this.game.physicalVehicle.xzSpeed / 1000 * 3600)
+        // // Speed achievement
+        // const speedKmPerHour = Math.floor(this.game.physicalVehicle.xzSpeed / 1000 * 3600)
 
-        if(this.game.achievements.groups.get('speed') && speedKmPerHour > this.game.achievements.groups.get('speed').progress)
-            this.game.achievements.setProgress('speed', speedKmPerHour)
+        // if(this.game.achievements.groups.get('speed') && speedKmPerHour > this.game.achievements.groups.get('speed').progress)
+        //     this.game.achievements.setProgress('speed', speedKmPerHour)
 
         // Distance driven
         this.distanceDriven.value += this.game.physicalVehicle.xzSpeed * this.game.ticker.deltaScaled
