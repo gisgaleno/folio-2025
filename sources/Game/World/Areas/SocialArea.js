@@ -82,6 +82,8 @@ export class SocialArea extends Area
 
         // Update materials 
         this.game.materials.updateObject(baseFan)
+
+        baseFan.removeFromParent()
         
         this.fans = {}
         this.fans.spawnerPosition = this.references.items.get('onlyFans')[0].position
@@ -100,6 +102,7 @@ export class SocialArea extends Area
 
             reference.position.copy(this.fans.spawnerPosition)
             reference.position.y += 99
+            reference.needsUpdate = true
             references.push(reference)
             
             // Object

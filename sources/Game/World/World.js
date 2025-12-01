@@ -37,7 +37,7 @@ export class World
 
         this.init(0)
 
-        this.setAxesHelper()
+        // this.setAxesHelper()
         // this.setCollisionGroupsTest()
         // this.setNormalTest()
         // this.setTestMesh()

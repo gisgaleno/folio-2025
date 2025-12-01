@@ -211,13 +211,13 @@ export class CookieArea extends Area
             {
                 reference.position.copy(this.references.items.get('table')[0].position)
                 reference.position.y += (i - this.cookies.count) * 0.25
-                reference.needsUpdate = true
             }
             else
             {
                 reference.position.copy(this.cookies.spawnerPosition)
                 reference.position.y += 99
             }
+            reference.needsUpdate = true
             references.push(reference)
             
             // Object

@@ -27,6 +27,6 @@ export default {
         topLevelAwait(),
         restart({ restart: [ '../static/**', ] }), // Restart server on static file change
         basicSsl(),
-        nodePolyfills()
+        // nodePolyfills()
     ]
 }
