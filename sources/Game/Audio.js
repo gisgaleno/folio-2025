@@ -144,55 +144,78 @@ export class Audio
 
     setPlaylist()
     {
-        const paths = [
-            // 'sounds/musics/scarborough-fair-dance_stem-04.mp3',
-            // 'sounds/musics/Moonglow.mp3',
-            // 'sounds/musics/Healing Native Flute 01.mp3',
-            // 'sounds/musics/omaha_main-full.mp3',
-            // 'sounds/musics/Portfolio BS - Track 1.mp3',
-            'sounds/musics/Portfolio BS - Track 2 V1.mp3',
-            'sounds/musics/Portfolio BS - Track 4 V1.mp3',
-        ]
-
         this.playlist = {}
-        this.playlist.songs = []
-        // this.playlist.index = (Math.floor(Date.now() / 1000 / 60 / 3) % paths.length) - 1 // Different music every X minutes
-        this.playlist.index = -1 // Different music every X minutes
+        this.playlist.songs = [
+            {
+                path: 'sounds/musics/Portfolio BS - Track 2 V1.mp3',
+                name: 'Track 2'
+            },
+            {
+                path: 'sounds/musics/Portfolio BS - Track 4 V1.mp3',
+                name: 'Track 4'
+            },
+        ]
+        this.playlist.index = (Math.floor(Date.now() / 1000 / 60 / 3) % this.playlist.songs.length) // Different music every X minutes
+        // this.playlist.index = -1 // Different music every X minutes
         this.playlist.current = null
+        this.playlist.switching = false
 
-        for(const path of paths)
+        for(const song of this.playlist.songs)
         {
-            const song = {}
             song.loaded = false
             song.sound = new Howl({
-                src: [ path ],
+                src: [ song.path ],
                 pool: 0,
                 autoplay: false,
                 loop: false,
                 preload: false,
-                volume: 0.15,
+                volume: 0.25,
                 onend: () =>
                 {
                     this.playlist.next()
                 }
             })
-            this.playlist.songs.push(song)
         }
 
         this.playlist.next = () =>
         {
-            this.playlist.index++
+            if(this.playlist.switching)
+                return
 
-            if(this.playlist.index >= this.playlist.songs.length)
-                this.playlist.index = 0
+            this.playlist.switching = true
+
+            // Disc change sound
+            this.game.audio.groups.get('discChange').play()
 
             // Old one
             if(this.playlist.current)
             {
                 this.playlist.current.sound.stop()
             }
+            
+            gsap.delayedCall(3, () =>
+            {
+                this.playlist.index++
 
-            // New one
+                if(this.playlist.index >= this.playlist.songs.length)
+                    this.playlist.index = 0
+
+                // New one
+                this.playlist.current = this.playlist.songs[this.playlist.index]
+
+                if(!this.playlist.current.loaded)
+                {
+                    this.playlist.current.sound.load()
+                }
+
+                this.playlist.current.sound.play()
+                
+                this.playlist.switching = false
+            })
+        }
+
+        this.playlist.play = () =>
+        {
             this.playlist.current = this.playlist.songs[this.playlist.index]
 
             if(!this.playlist.current.loaded)
@@ -205,7 +228,7 @@ export class Audio
 
         if(import.meta.env.VITE_MUSIC)
         {
-            this.playlist.next()
+            this.playlist.play()
         }
     }
 
@@ -466,6 +489,14 @@ export class Audio
 
     setOneOffs()
     {
+        this.register({
+            group: 'discChange',
+            path: 'sounds/jukebox/DVDPlayerChangeDisc_BW.49824.mp3',
+            autoplay: false,
+            loop: false,
+            volume: 0.3,
+        })
+        
         this.register({
             group: 'slide',
             path: 'sounds/mecanism/slide.mp3',
