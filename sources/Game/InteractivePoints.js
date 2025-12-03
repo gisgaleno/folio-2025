@@ -94,7 +94,7 @@ export class InteractivePoints
     setKeyIcon()
     {
         // Material
-        const material = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: true })
+        const material = new THREE.MeshLambertNodeMaterial({ transparent: true, depthTest: false })
 
         const iconOutput = Fn(([iconAlpha]) =>
         {
@@ -454,7 +454,6 @@ export class InteractivePoints
                 material.depthTest = false
                 material.needsUpdate = true
             }
-            this.keyIcon.material.depthTest = false
 
             // Reveal
             this.sounds.reveal.play()
@@ -491,7 +490,6 @@ export class InteractivePoints
                     material.depthTest = true
                     material.needsUpdate = true
                 }
-                this.keyIcon.material.depthTest = true
             } })
 
             if(this.activeItem === item)
