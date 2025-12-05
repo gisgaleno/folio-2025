@@ -4,6 +4,15 @@
         align-items center
         justify-content center
         white-space nowrap
+        
+        table
+            border-spacing 0 10px
+
+            @media only screen and (max-height 620px)
+                border-spacing 0 5px
+
+            @media only screen and (max-height 540px)
+                border-spacing 0 0
 
         tr
             td:first-child
