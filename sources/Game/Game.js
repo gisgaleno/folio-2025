@@ -46,6 +46,7 @@ import { Menu } from './Menu.js'
 import { Title } from './Title.js'
 import { PreRenderer } from './PreRenderer.js'
 import { Options } from './Options.js'
+import gsap from 'gsap'
 
 export class Game
 {
@@ -200,6 +201,64 @@ export class Game
         {
             this.achievements.setProgress('debug', 1)
         }
+    }
+
+    reset()
+    {
+        // Interactive buttons
+        this.inputs.interactiveButtons.clearItems()
+
+        // Player respawn
+        this.player.respawn(null, () =>
+        {
+            // Objects reset
+            this.objects.resetAll()
+
+            // Explosive crates
+            if(this.world.explosiveCrates)
+                this.world.explosiveCrates.reset()
+
+            // Bowling
+            if(this.world.areas.bowling)
+                this.world.areas.bowling.restart()
+
+            // Cookie
+            if(this.world.areas.cookie)
+                this.world.areas.cookie.cookies.instancedGroup.needsUpdate = true
+
+            // Toilet
+            if(this.world.areas.toilet)
+                this.world.areas.toilet.cabin.down = false
+
+            // Social
+            if(this.world.areas.social)
+            {
+                this.world.areas.social.statue.down = false
+                this.world.areas.social.fans.instancedGroup.needsUpdate = true
+            }
+            
+            // Benches
+            if(this.world.benches)
+                this.world.benches.instancedGroup.needsUpdate = true
+            
+            // Fences
+            if(this.world.fences)
+                this.world.fences.instancedGroup.needsUpdate = true
+            
+            // Bricks
+            if(this.world.bricks)
+                this.world.bricks.instancedGroup.needsUpdate = true
+            
+            // Lanterns
+            if(this.world.lanterns)
+                this.world.lanterns.instancedGroup.needsUpdate = true
+
+            // Achievement
+            gsap.delayedCall(2, () =>
+            {
+                this.achievements.setProgress('reset', 1)
+            })
+        })
     }
 }
 

@@ -10,6 +10,7 @@ export class Options
         this.setSound()
         this.setQuality()
         this.setRespawn()
+        this.setReset()
         this.setRenderer()
         this.setServer()
     }
@@ -45,6 +46,17 @@ export class Options
         element.addEventListener('click', () =>
         {
             this.game.player.respawn()
+            this.game.menu.close()
+        })
+    }
+
+    setReset()
+    {
+        const element = this.element.querySelector('.js-reset')
+
+        element.addEventListener('click', () =>
+        {
+            this.game.reset()
             this.game.menu.close()
         })
     }
