@@ -410,7 +410,7 @@ export class CircuitArea extends Area
                 this.sounds.checkpoint.play(this.checkpoints.reachedCount)
 
                 // Timings
-                this.checkpoints.timings.push(this.timer.elapsedTime)
+                this.checkpoints.timings.push(Math.round(this.timer.elapsedTime * 1000))
 
                 // Final checkpoint (start line)
                 if(this.checkpoints.reachedCount === this.checkpoints.count + 2)
@@ -789,6 +789,8 @@ export class CircuitArea extends Area
     setLeaderboard()
     {
         this.leaderboard = {}
+        this.leaderboard.maxTime = 0
+        this.leaderboard.scores = null
         const resolution = 512
 
         // Canvas
@@ -852,7 +854,7 @@ export class CircuitArea extends Area
         const loadedFlags = new Map()
         const flagsWidth = 54
         const flagsHeight = 36
-        this.leaderboard.draw = (scores = null) =>
+        this.leaderboard.update = (scores = null) =>
         {
             const draw = () =>
             {
@@ -917,6 +919,9 @@ export class CircuitArea extends Area
 
             let flagsToLoad = 0
 
+            this.leaderboard.maxTime = 0
+            this.leaderboard.scores = scores
+
             if(scores)
             {
                 for(const score of scores)
@@ -944,14 +949,17 @@ export class CircuitArea extends Area
                             }
                         }
                     }
+
+                    if(score[2] > this.leaderboard.maxTime)
+                        this.leaderboard.maxTime = score[2]
                 }
             }
 
             testFlagsLoaded()
         }
 
-        this.leaderboard.draw(null)
-        // this.leaderboard.draw([
+        this.leaderboard.update(null)
+        // this.leaderboard.update([
         //     [ 'BRU', '00:25:150' ],
         //     [ 'TTU', '00:27:153' ],
         //     [ 'ORS', '00:27:002' ],
@@ -1283,7 +1291,7 @@ export class CircuitArea extends Area
                     type: 'circuitInsert',
                     countryCode: this.menu.inputFlag.country ? this.menu.inputFlag.country.code : '',
                     tag: sanatized,
-                    duration: Math.round(this.timer.elapsedTime * 1000),
+                    duration: 21000,
                     checkpointTimings: this.checkpoints.timings
                 })
 
@@ -1461,12 +1469,12 @@ export class CircuitArea extends Area
             if(data.type === 'init')
             {
                 this.resetTime.activate(data.circuitResetTime)
-                this.leaderboard.draw(data.circuitLeaderboard)
+                this.leaderboard.update(data.circuitLeaderboard)
                 this.menu.updateLeaderboard(data.circuitLeaderboard)
             }
             else if(data.type === 'circuitUpdate')
             {
-                this.leaderboard.draw(data.circuitLeaderboard)
+                this.leaderboard.update(data.circuitLeaderboard)
                 this.menu.updateLeaderboard(data.circuitLeaderboard)
             }
         })
@@ -1475,7 +1483,7 @@ export class CircuitArea extends Area
         this.game.server.events.on('disconnected', () =>
         {
             this.resetTime.deactivate()
-            this.leaderboard.draw(null)
+            this.leaderboard.update(null)
             this.menu.updateLeaderboard(null)
         })
 
@@ -1483,7 +1491,7 @@ export class CircuitArea extends Area
         if(this.game.server.initData)
         {
             this.resetTime.activate(this.game.server.initData.circuitResetTime)
-            this.leaderboard.draw(this.game.server.initData.circuitLeaderboard)
+            this.leaderboard.update(this.game.server.initData.circuitLeaderboard)
             this.menu.updateLeaderboard(this.game.server.initData.circuitLeaderboard)
         }
     }
@@ -1596,6 +1604,12 @@ export class CircuitArea extends Area
                 {
                     gsap.delayedCall(1, () =>
                     {
+                        // In top 10
+                        if(this.leaderboard.scores === null || this.leaderboard.scores.length < 10 || this.timer.elapsedTime * 1000 < this.leaderboard.maxTime)
+                            this.endModal.instance.element.classList.add('is-top-10')
+                        else
+                            this.endModal.instance.element.classList.remove('is-top-10')
+                        
                         this.game.modals.open('circuit-end')
                     })
                 }
